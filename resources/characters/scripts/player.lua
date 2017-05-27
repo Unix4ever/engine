@@ -15,8 +15,7 @@ return function(self)
       statusBar.setCurrentHP(self:stats():getNumber('hp', 1))
     end
 
-    function updateHp(e)
-      local event = StatEvent.cast(e)
+    function updateHp(event)
       if event.id == 'maxHP' then
         statusBar.setMaximumHP(self:stats():getNumber('maxHP', 1))
       end
@@ -27,6 +26,6 @@ return function(self)
     end
 
     initStatusBar()
-    event:bind(self:stats(), 'statChange', updateHp)
+    event:onStat(self:stats(), 'statChange', updateHp)
   end
 end

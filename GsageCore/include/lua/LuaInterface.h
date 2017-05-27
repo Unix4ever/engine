@@ -36,6 +36,8 @@ struct lua_State;
 
 namespace sol
 {
+  template<typename T>
+  class usertype;
   class state_view;
 }
 
@@ -162,6 +164,16 @@ namespace Gsage
        * @param path Path to folder with resources
        */
       void setResourcePath(const std::string& path);
+
+      /**
+       * Register new event type
+       *
+       * @param name Lua event class name
+       * @param handler Name of handler to create
+       * @param ut Bindings
+       */
+      template<class T>
+      void registerEvent(const std::string& name, const std::string& handler, sol::usertype<T> ut);
     private:
       void closeLuaState();
       GsageFacade* mInstance;

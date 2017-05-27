@@ -103,6 +103,9 @@ namespace Gsage {
     std::ifstream stream(path);
     std::string res;
     bool success = true;
+    if(!stream) {
+      return std::make_pair("", false);
+    }
     try
     {
       stream.seekg(0, std::ios::end);
@@ -111,10 +114,10 @@ namespace Gsage {
       res.assign((std::istreambuf_iterator<char>(stream)),
                   std::istreambuf_iterator<char>());
     }
-    catch(...)
+    catch(std::exception& e)
     {
       success = false;
-      LOG(ERROR) << "Failed to read file: " << path;
+      LOG(ERROR) << "Failed to read file: " << path << ", reason: " << e.what();
     }
 
     stream.close();

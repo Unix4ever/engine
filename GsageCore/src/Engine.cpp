@@ -25,7 +25,6 @@ THE SOFTWARE.
 */
 
 #include "Engine.h"
-#include "EngineSystem.h"
 #include "EngineEvent.h"
 
 #include "Component.h"
@@ -80,13 +79,15 @@ bool Engine::initialize(const Dictionary& configuration, const Dictionary& envir
 
 bool Engine::configureSystems(const Dictionary& config)
 {
+  unionDict(mConfiguration, config);
   for(std::string& systemName : mSetUpOrder)
   {
     LOG(INFO) << "Configuring system " << systemName;
-    auto systemConfig = config.get<Dictionary>(systemName);
+    auto systemConfig = mConfiguration.get<Dictionary>(systemName);
     mEngineSystems[systemName]->configure(systemConfig.second ? systemConfig.first : Dictionary());
   }
 
+  fireEvent(SettingsEvent(SettingsEvent::UPDATE, mConfiguration));
   return true;
 }
 

@@ -34,12 +34,12 @@ THE SOFTWARE.
 #include "Dictionary.h"
 
 namespace Gsage {
-  TYPE_CASTER(OgreDegreeCaster, Ogre::Degree);
-  TYPE_CASTER(OgreColourValueCaster, Ogre::ColourValue);
-  TYPE_CASTER(OgreVector3Caster, Ogre::Vector3);
-  TYPE_CASTER(OgreQuaternionCaster, Ogre::Quaternion);
-  TYPE_CASTER(OgreFloatRectCaster, Ogre::FloatRect);
-  TYPE_CASTER(OgrePixelFormatCaster, Ogre::PixelFormat);
+  TYPE_CASTER(OgreDegreeCaster, Ogre::Degree, std::string);
+  TYPE_CASTER(OgreColourValueCaster, Ogre::ColourValue, std::string);
+  TYPE_CASTER(OgreVector3Caster, Ogre::Vector3, std::string);
+  TYPE_CASTER(OgreQuaternionCaster, Ogre::Quaternion, std::string);
+  TYPE_CASTER(OgreFloatRectCaster, Ogre::FloatRect, std::string);
+  TYPE_CASTER(OgrePixelFormatCaster, Ogre::PixelFormat, std::string);
 }
 
 #endif

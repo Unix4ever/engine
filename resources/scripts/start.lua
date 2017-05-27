@@ -45,7 +45,7 @@ end
 
 function setActiveCamera(id)
   local camera = entity.get(id)
-  camera:render().root:getChild("camera", id):attach(core:render().viewport)
+  camera:render().root:getCamera(id):attach(core:render().viewport)
 end
 
 function spawnMore(count)
@@ -79,8 +79,7 @@ function onKeyEvent(event)
   end
 end
 
-function onSelect(event)
-  e = OgreSelectEvent.cast(event)
+function onSelect(e)
   if e:hasFlags(OgreSceneNode.DYNAMIC) then
     local target = entity.get(e.entity)
     if actions.attackable(player, target) then
@@ -95,8 +94,7 @@ function onSelect(event)
   end
 end
 
-function onRoll(event)
-  e = OgreSelectEvent.cast(event)
+function onRoll(e)
   if e.type == "rollOver" then
     local target = entity.get(e.entity)
     if e:hasFlags(OgreSceneNode.DYNAMIC) then
@@ -118,10 +116,10 @@ function onReady(e)
   player = entity.get("sinbad")
   core:movement():setControlledEntity(player.id)
 
-  event:bind(core, "objectSelected", onSelect)
+  event:ogreSelect(core, "objectSelected", onSelect)
   if rocket ~= nil then
-    event:bind(core, "rollOver", onRoll)
-    event:bind(core, "rollOut", onRoll)
+    event:ogreSelect(core, "rollOver", onRoll)
+    event:ogreSelect(core, "rollOut", onRoll)
   end
 
   core:script():addUpdateListener(async.addTime)

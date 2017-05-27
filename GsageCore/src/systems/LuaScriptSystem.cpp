@@ -40,10 +40,13 @@ extern "C" {
 
 namespace Gsage {
 
+  const std::string LuaScriptSystem::ID = "lua";
+
   LuaScriptSystem::LuaScriptSystem()
     : mState(0)
     , mWorkdir(".")
   {
+    mSystemInfo.put("type", LuaScriptSystem::ID);
   }
 
   LuaScriptSystem::~LuaScriptSystem()

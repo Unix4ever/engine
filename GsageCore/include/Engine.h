@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include "EventDispatcher.h"
 #include "GsageDefinitions.h"
 #include "Entity.h"
+#include "EngineSystem.h"
 
 #include "ObjectPool.h"
 #include <map>
@@ -115,6 +116,11 @@ namespace Gsage
         EngineSystem* system = getSystem(C::type::SYSTEM);
         if(!system)
           return 0;
+
+        std::string type = system->getSystemInfo().get("type", "");
+        if(!type.empty() && type != C::ID) {
+          return 0;
+        }
 
         return static_cast<C*>(system);
       }
@@ -219,6 +225,10 @@ namespace Gsage
        */
       const Dictionary& env() const { return mEnvironment; }
 
+      /**
+       * Get settings
+       */
+      const Dictionary& settings() const { return mConfiguration; }
     private:
       /**
        * Create component for entity

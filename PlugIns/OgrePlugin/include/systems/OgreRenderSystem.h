@@ -89,6 +89,7 @@ namespace Gsage
   class OgreRenderSystem : public ComponentStorage<RenderComponent>, public Ogre::RenderQueueListener, public EventDispatcher, public RenderSystem
   {
     public:
+      static const std::string ID;
       static const std::string CAMERA_CHANGED;
 
       OgreRenderSystem();

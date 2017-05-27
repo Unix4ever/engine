@@ -66,8 +66,8 @@ namespace Gsage {
     mLuaInterface = new LuaInterface(this);
 
     // Register core system factories
-    registerSystemFactory<CombatSystem>("dynamicStats");
-    mSystemManager.registerFactory("lua", new LuaScriptSystemFactory(mLuaInterface));
+    registerSystemFactory<CombatSystem>();
+    mSystemManager.registerFactory(LuaScriptSystem::ID, new LuaScriptSystemFactory(mLuaInterface));
   }
 
 

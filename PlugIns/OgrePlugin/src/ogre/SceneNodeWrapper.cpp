@@ -81,7 +81,9 @@ namespace Gsage {
       LOG(ERROR) << "Failed to create node \"" << mObjectId << "\" parent node is not set";
       return;
     }
+    mObjectId = id;
     mNode = mParentNode->createChildSceneNode(mObjectId);
+    LOG(INFO) << "Creating scene node \"" << mObjectId << "\"";
   }
 
   const std::string& SceneNodeWrapper::getId() const
@@ -228,7 +230,7 @@ namespace Gsage {
     while ( itChild.hasMoreElements() )
     {
       Ogre::SceneNode* pChildNode = static_cast<Ogre::SceneNode*>(itChild.getNext());
-      destroyAllAttachedMovableObjects( pChildNode );
+      destroyAllAttachedMovableObjects(pChildNode);
     }
   }
 
@@ -238,6 +240,26 @@ namespace Gsage {
       return 0;
 
     return mChildren[type][name];
+  }
+
+  void SceneNodeWrapper::pitch(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo)
+  {
+    mNode->pitch(angle, relativeTo);
+  }
+
+  void SceneNodeWrapper::yaw(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo)
+  {
+    mNode->yaw(angle, relativeTo);
+  }
+
+  void SceneNodeWrapper::roll(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo)
+  {
+    mNode->roll(angle, relativeTo);
+  }
+
+  void SceneNodeWrapper::translate(const Ogre::Vector3& d, Ogre::Node::TransformSpace relativeTo)
+  {
+    mNode->translate(d, relativeTo);
   }
 
   bool SceneNodeWrapper::onFactoryUnregister(EventDispatcher* sender, const Event& event)

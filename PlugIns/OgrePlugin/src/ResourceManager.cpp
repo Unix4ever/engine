@@ -99,7 +99,11 @@ namespace Gsage {
   {
     for(auto& pair : resources)
     {
-      unload(pair.first);
+      try {
+        unload(pair.first);
+      } catch(Ogre::Exception& e) {
+        LOG(WARNING) << "Failed to unload resource " << pair.first << ", reason: " << e.what();
+      }
     }
   }
 }

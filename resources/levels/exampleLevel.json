@@ -3,7 +3,8 @@
     "render": {
       "resources": {
         "exampleLevel": [
-          "Zip:models/packs/exampleLevel.zip"
+          "Zip:models/packs/exampleLevel.zip",
+          "Zip:models/packs/torch.zip"
         ]
       },
 
@@ -35,14 +36,33 @@
     "id": "camera",
     "render": {
       "root": {
-        "position": "0,0,0",
-        "rotation": "1,0,-1,0",
-        "scale": "1,1,1",
-        "children": [{
-          "type": "camera",
-          "name": "camera"
+        "position": "0,60,0",
+        "children": [
+        {
+          "type": "node",
+          "name": "yaw",
+          "children": [
+          {
+            "type": "node",
+            "name": "pitch",
+            "children": [
+            {
+              "type": "node",
+              "name": "roll",
+              "children": [
+              {
+                "bgColour": "0x000000",
+                "type": "camera",
+                "clipDistance": 0.01,
+                "name": "camera"
+              }]
+            }]
+          }]
         }]
       }
+    },
+    "script": {
+      "setupScript": "@File:scripts/setup/freeCamera.lua"
     }
   }, {
     "id": "castle",

@@ -1,3 +1,6 @@
+#ifndef _Serializer_H_
+#define _Serializer_H_
+
 /*
 -----------------------------------------------------------------------------
 This file is a part of Gsage engine
@@ -24,31 +27,73 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#ifndef _CombatSystem_H_
-#define _CombatSystem_H_
+#include <json/json.h>
 
-#include "components/StatsComponent.h"
-#include "ComponentStorage.h"
 
-namespace Gsage
-{
-  class Entity;
+namespace Gsage {
 
-  class CombatSystem : public ComponentStorage<StatsComponent>
+  struct NotFound {
+    // no writer found
+  };
+
+  template<class T>
+  struct Preprocessor {
+    typedef NotFound type;
+  };
+
+  template<class T>
+  struct Writer {
+    typedef NotFound type;
+  };
+
+  struct JsonValueWriter {
+    bool write(const std::string& key, const int& src, Json::Value& dst)
+    {
+      dst[key] = src;
+      return true;
+    }
+  };
+
+  template<>
+  struct Writer<Json::Value> {
+    typedef JsonValueWriter type;
+  };
+
+  template<class T>
+  class Serializer
   {
     public:
-      // System class identifier
-      static const std::string ID;
-      CombatSystem();
-      virtual ~CombatSystem();
+      Serializer() {};
+      virtual ~Serializer() {};
 
-      /**
-       * Update stats component
-       * @param component StatsComponent pointer
-       * @param entity Entity that owns the component
-       * @param time Elapsed time
-       */
-      void updateComponent(StatsComponent* component, Entity* entity, const double& time);
+      template<class F, class C>
+      bool write(const F& src, C& dest)
+      {
+        return false;
+      }
+
+      template<class F, class C>
+      bool write(const std::string& key, const T& src, C& dest)
+      {
+        return false;
+      }
+  };
+
+  class SerializationFactory
+  {
+    public:
+      template<class T, class C>
+      static const T& create(C& src)
+      {
+        return Serializer<T>::read(src);
+      }
+
+      template<class T, class C>
+      static bool dump(const T& src, C& dst)
+      {
+        Serializer<T> s;
+        return s.template dump<C>(src, dst);
+      }
   };
 }
 

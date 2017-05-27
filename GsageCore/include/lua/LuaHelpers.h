@@ -1,8 +1,10 @@
+#ifndef _LUA_HELPERS_H_
+#define _LUA_HELPERS_H_
 /*
 -----------------------------------------------------------------------------
 This file is a part of Gsage engine
 
-Copyright (c) 2014-2017 Artem Chernyshev
+Copyright (c) 2014-2016 Artem Chernyshev
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +26,29 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "%includePath%"
+#include "sol.hpp"
+#include "lua/LuaEventProxy.h"
 
 namespace Gsage {
-
-  %className%::%className%()
+  template<class T>
+  void LuaInterface::registerEvent(const std::string& name, const std::string& handler, sol::usertype<T> ut)
   {
-  }
+    if(!std::is_base_of<Event, T>::value)
+    {
+      LOG(ERROR) << "Event not registered: specified type is not derived from Event";
+      return;
+    }
 
-  %className%::~%className%()
-  {
-  }
+    if(!mStateView)
+    {
+      LOG(ERROR) << "Event not registered: no lua state";
+      return;
+    }
 
+    sol::state_view& lua = *mStateView;
+
+    lua.set_usertype(name, ut);
+    lua["LuaEventProxy"][handler] = &LuaEventProxy::addEventListener<T>;
+  }
 }
+#endif

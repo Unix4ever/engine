@@ -44,6 +44,7 @@ namespace Gsage
   class LuaScriptSystem : public ComponentStorage<ScriptComponent>
   {
     public:
+      static const std::string ID;
       LuaScriptSystem();
       virtual ~LuaScriptSystem();
 

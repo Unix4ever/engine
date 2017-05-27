@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include "OgreSelectEvent.h"
 
 #include "lua/LuaInterface.h"
+#include "lua/LuaHelpers.h"
 
 #include "components/MovementComponent.h"
 #include "components/RenderComponent.h"
@@ -78,11 +79,16 @@ namespace Gsage {
       lua.new_simple_usertype<SceneNodeWrapper>(
           "OgreSceneNode",
           sol::base_classes, sol::bases<OgreObject>(),
+          "orientation", sol::property(&SceneNodeWrapper::getOrientation),
           "getChild", &SceneNodeWrapper::getChild,
           "getSceneNode", &SceneNodeWrapper::getChildOfType<SceneNodeWrapper>,
           "getEntity", &SceneNodeWrapper::getChildOfType<EntityWrapper>,
           "getParticleSystem", &SceneNodeWrapper::getChildOfType<ParticleSystemWrapper>,
           "getCamera", &SceneNodeWrapper::getChildOfType<CameraWrapper>,
+          "pitch", &SceneNodeWrapper::pitch,
+          "yaw", &SceneNodeWrapper::yaw,
+          "roll", &SceneNodeWrapper::roll,
+          "translate", &SceneNodeWrapper::translate,
           "STATIC", sol::var(SceneNodeWrapper::STATIC),
           "DYNAMIC", sol::var(SceneNodeWrapper::DYNAMIC)
       );
@@ -103,7 +109,8 @@ namespace Gsage {
 
       lua.new_usertype<CameraWrapper>("CameraWrapper",
           sol::base_classes, sol::bases<OgreObject>(),
-          "attach", &CameraWrapper::attach
+          "attach", &CameraWrapper::attach,
+          "isActive", &CameraWrapper::isActive
       );
 
       // Systems
@@ -125,17 +132,24 @@ namespace Gsage {
       // Components
 
       lua.new_usertype<RenderComponent>("RenderComponent",
-          "position", sol::property(&RenderComponent::getPosition),
+          "position", sol::property((void(RenderComponent::*)(const Ogre::Vector3&))&RenderComponent::setPosition, &RenderComponent::getPosition),
           "root", sol::property(&RenderComponent::getRoot),
           "direction", sol::property(&RenderComponent::getDirection),
-          "orientation", sol::property(&RenderComponent::getOrientation),
+          "orientation", sol::property(&RenderComponent::setOrientation, &RenderComponent::getOrientation),
           "facingOrientation", sol::property(&RenderComponent::getFaceOrientation),
-          "lookAt", &RenderComponent::lookAt,
+          "lookAt", sol::overload(
+            (void(RenderComponent::*)(const Ogre::Vector3&, const RenderComponent::RotationAxis, Ogre::Node::TransformSpace))&RenderComponent::lookAt,
+            (void(RenderComponent::*)(const Ogre::Vector3&))&RenderComponent::lookAt
+          ),
           "rotate", &RenderComponent::rotate,
           "playAnimation", &RenderComponent::playAnimation,
           "resetAnimation", &RenderComponent::resetAnimationState,
           "setAnimationState", &RenderComponent::setAnimationState,
-          "adjustAnimationSpeed", &RenderComponent::adjustAnimationStateSpeed
+          "adjustAnimationSpeed", &RenderComponent::adjustAnimationStateSpeed,
+
+          "X_AXIS", sol::var(RenderComponent::X_AXIS),
+          "Y_AXIS", sol::var(RenderComponent::Y_AXIS),
+          "Z_AXIS", sol::var(RenderComponent::Z_AXIS)
       );
 
       lua.new_usertype<MovementComponent>("MovementComponent",
@@ -165,7 +179,18 @@ namespace Gsage {
           "NEGATIVE_UNIT_X", sol::var(Ogre::Vector3::NEGATIVE_UNIT_X),
           "NEGATIVE_UNIT_Y", sol::var(Ogre::Vector3::NEGATIVE_UNIT_Y),
           "NEGATIVE_UNIT_Z", sol::var(Ogre::Vector3::NEGATIVE_UNIT_Z),
-          "UNIT_SCALE", sol::var(Ogre::Vector3::UNIT_SCALE)
+          "UNIT_SCALE", sol::var(Ogre::Vector3::UNIT_SCALE),
+          sol::meta_function::multiplication, sol::overload(
+            (Ogre::Vector3(Ogre::Vector3::*)(const Ogre::Vector3&)const)&Ogre::Vector3::operator*,
+            (Ogre::Vector3(Ogre::Vector3::*)(const Ogre::Real)const)&Ogre::Vector3::operator*
+          ),
+          sol::meta_function::addition, (Ogre::Vector3(Ogre::Vector3::*)(const Ogre::Vector3&)const)&Ogre::Vector3::operator+,
+          sol::meta_function::equal_to, (Ogre::Vector3(Ogre::Vector3::*)(const Ogre::Vector3&)const)&Ogre::Vector3::operator==
+      );
+
+      lua.new_usertype<Ogre::Node>("OgreNode",
+          "TS_LOCAL", sol::var(Ogre::Node::TS_LOCAL),
+          "TS_WORLD", sol::var(Ogre::Node::TS_WORLD)
       );
 
       lua.new_usertype<Ogre::Quaternion>("Quaternion",
@@ -174,17 +199,26 @@ namespace Gsage {
           "x", &Ogre::Quaternion::x,
           "y", &Ogre::Quaternion::y,
           "z", &Ogre::Quaternion::z,
-          sol::meta_function::multiplication, (Ogre::Quaternion(Ogre::Quaternion::*)(const Ogre::Quaternion&)const)  &Ogre::Quaternion::operator*
+          sol::meta_function::multiplication, sol::overload(
+            (Ogre::Quaternion(Ogre::Quaternion::*)(const Ogre::Quaternion&)const)  &Ogre::Quaternion::operator*,
+            (Ogre::Vector3(Ogre::Quaternion::*)(const Ogre::Vector3&)const)  &Ogre::Quaternion::operator*
+          )
       );
 
       lua.new_usertype<Ogre::Radian>("Radian",
           sol::constructors<sol::types<float>>()
       );
 
-      lua.new_usertype<OgreSelectEvent>("OgreSelectEvent",
+      lua.new_usertype<Ogre::Degree>("Degree",
+          sol::constructors<sol::types<float>>()
+      );
+
+      // Override select event
+      mLuaInterface->registerEvent("OgreSelectEvent", "ogreSelect",
+        sol::usertype<OgreSelectEvent>(
           sol::base_classes, sol::bases<Event, SelectEvent>(),
-          "intersection", sol::property(&OgreSelectEvent::getIntersection),
-          "cast", cast<const Event&, const OgreSelectEvent&>
+          "intersection", sol::property(&OgreSelectEvent::getIntersection)
+        )
       );
 
       lua["Engine"]["render"] = &Engine::getSystem<OgreRenderSystem>;
@@ -202,8 +236,8 @@ namespace Gsage {
 
   bool OgrePlugin::installImpl()
   {
-    mFacade->registerSystemFactory<OgreRenderSystem>("ogre");
-    mFacade->registerSystemFactory<RecastMovementSystem>("recast");
+    mFacade->registerSystemFactory<OgreRenderSystem>();
+    mFacade->registerSystemFactory<RecastMovementSystem>();
     return true;
   }
 
@@ -222,7 +256,8 @@ namespace Gsage {
 
     mFacade->getEngine()->removeSystem("render");
     mFacade->getEngine()->removeSystem("movement");
-
+    mFacade->removeSystemFactory<OgreRenderSystem>();
+    mFacade->removeSystemFactory<RecastMovementSystem>();
   }
 
   OgrePlugin* ogrePlugin = NULL;

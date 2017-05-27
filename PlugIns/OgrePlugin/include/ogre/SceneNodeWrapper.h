@@ -162,6 +162,37 @@ namespace Gsage {
         return static_cast<T*>(getChild(T::TYPE, name));
       }
 
+      /**
+       * Rotate the node around X axis
+       *
+       * @param angle Rotation angle
+       * @param relativeTo Transformation space
+       */
+      void pitch(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo=Ogre::Node::TS_LOCAL);
+
+      /**
+       * Rotate the node around Y axis
+       *
+       * @param angle Rotation angle
+       * @param relativeTo Transformation space
+       */
+      void yaw(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo=Ogre::Node::TS_LOCAL);
+
+      /**
+       * Rotate the node around Z axis
+       *
+       * @param angle Rotation angle
+       * @param relativeTo Transformation space
+       */
+      void roll(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo=Ogre::Node::TS_LOCAL);
+
+      /**
+       * Moves the node along the Cartesian axes
+       *
+       * @param d Vector with x,y,z values representing the translation
+       * @param relativeTo Transformation space
+       */
+      void translate(const Ogre::Vector3& d, Ogre::Node::TransformSpace relativeTo=Ogre::Node::TS_LOCAL);
     private:
       /**
        * Handle factory removal event

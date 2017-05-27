@@ -37,12 +37,15 @@ THE SOFTWARE.
 
 namespace Gsage {
 
+  const std::string RecastMovementSystem::ID = "recast";
+
   RecastMovementSystem::RecastMovementSystem() :
     mRecast(0),
     mCache(0),
     mPosition(0,0,0),
     mAgentCounter(0)
   {
+    mSystemInfo.put("type", RecastMovementSystem::ID);
   }
 
   RecastMovementSystem::~RecastMovementSystem()

@@ -34,7 +34,7 @@ local function attack(self, context)
     return false
   end
 
-  self:render():lookAt(context.target:render().position)
+  self:render():lookAt(context.target:render().position, RenderComponent.Y_AXIS, OgreNode.TS_WORLD)
   self:render():playAnimation(anims[math.random(3)], 1, 1, 0, false)
   async.waitSeconds(0.5)
   actions.inflictDamage(self, context.target)

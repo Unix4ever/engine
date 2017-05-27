@@ -52,6 +52,8 @@ namespace Gsage
   class RecastMovementSystem : public ComponentStorage<MovementComponent>, public EventSubscriber<RecastMovementSystem>
   {
     public:
+      // System class identifier
+      static const std::string ID;
       RecastMovementSystem();
       virtual ~RecastMovementSystem();
 

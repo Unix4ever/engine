@@ -102,11 +102,29 @@ namespace Gsage
       }
 
       /**
+       * @copydoc Gsage::SystemManager::registerSystem
+       */
+      template<typename T>
+      bool registerSystemFactory()
+      {
+        return mSystemManager.registerSystem<T>();
+      }
+
+      /**
        * @copydoc Gsage::SystemManager::removeSystem
        */
       bool removeSystemFactory(const std::string& id)
       {
         return mSystemManager.removeSystem(id);
+      }
+
+      /**
+       * @copydoc Gsage::SystemManager::removeSystem
+       */
+      template<class S>
+      bool removeSystemFactory()
+      {
+        return mSystemManager.removeSystem<S>();
       }
 
       /**

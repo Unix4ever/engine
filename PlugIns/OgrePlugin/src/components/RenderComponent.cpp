@@ -65,10 +65,34 @@ namespace Gsage {
       mRootNode->rotate(rotation, Ogre::Node::TransformSpace::TS_LOCAL);
   }
 
+  void RenderComponent::lookAt(const Ogre::Vector3& position, const RotationAxis rotationAxis, Ogre::Node::TransformSpace transformSpace)
+  {
+    if(!mRootNode)
+      return;
+
+    Ogre::Vector3 axis = Ogre::Vector3::ZERO;
+
+    switch(rotationAxis) {
+      case X_AXIS:
+        axis.x = 1;
+        break;
+      case Y_AXIS:
+        axis.y = 1;
+        break;
+      case Z_AXIS:
+        axis.z = 1;
+        break;
+      default:
+        mRootNode->lookAt(position, transformSpace);
+        return;
+    }
+
+    mRootNode->lookAt(position * (Ogre::Vector3::UNIT_SCALE - axis) + (mRootNode->getPositionWithoutOffset() * axis), transformSpace);
+  }
+
   void RenderComponent::lookAt(const Ogre::Vector3& position)
   {
-    if(mRootNode)
-      mRootNode->lookAt(position * Ogre::Vector3(1, 0, 1) + (mRootNode->getPositionWithoutOffset() * Ogre::Vector3::UNIT_Y), Ogre::Node::TS_WORLD);
+    lookAt(position, NONE);
   }
 
   Dictionary RenderComponent::getAnimations()

@@ -85,6 +85,8 @@ namespace Gsage {
   }
 
   const std::string OgreRenderSystem::CAMERA_CHANGED = "cameraChanged";
+  // Render system identifier for the factory registration
+  const std::string OgreRenderSystem::ID = "ogre";
 
   OgreRenderSystem::OgreRenderSystem() :
     mRoot(0),
@@ -98,7 +100,7 @@ namespace Gsage {
     mOgreInteractionManager(0),
     mWindowEventListener(0)
   {
-    mSystemInfo.put("type", "ogre");
+    mSystemInfo.put("type", OgreRenderSystem::ID);
     mLogManager = new Ogre::LogManager();
   }
 
@@ -296,6 +298,11 @@ namespace Gsage {
           config.get("fog.start", 0.0f),
           config.get("fog.end", 0.0f)
       );
+    }
+
+    if(config.count("skybox") != 0)
+    {
+      mSceneManager->setSkyBox(true, config.get("skybox", ""));
     }
 
     if(config.count("camera") != 0)

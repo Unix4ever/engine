@@ -43,6 +43,7 @@ namespace Gsage {
   class TestSystem : public EngineSystem
   {
     public:
+      static const std::string ID;
       typedef TestComponent type;
       virtual ~TestSystem()
       {

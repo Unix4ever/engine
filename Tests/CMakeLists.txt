@@ -21,6 +21,7 @@ set(TEST_FILES
   Core/TestEngine.cpp
   Core/TestEventDispatcher.cpp
   Core/TestSerializable.cpp
+  Core/TestSerializer.cpp
   Core/TestDictionary.cpp
   Core/TestGsageFacade.cpp
   Core/TestFileLoader.cpp)
@@ -35,7 +36,7 @@ if(${OGRE_FOUND})
     ${TEST_DEPENDENCIES}
     ${OGRE_LIBRARIES}
   )
-  file(GLOB ogreTests PlugIns/OgrePlugin/*.cpp)
+  file(GLOB ogreTests Plugins/OgrePlugin/*.cpp)
   set(TEST_FILES ${ogreTests} ${TEST_FILES})
 endif(${OGRE_FOUND})
 
