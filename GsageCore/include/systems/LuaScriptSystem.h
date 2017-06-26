@@ -51,13 +51,13 @@ namespace Gsage
       /**
        * @copydoc EngineSystem::initialize()
        */
-      virtual bool initialize(const Dictionary& settings);
+      virtual bool initialize(const DataProxy& settings);
       /**
        * Registers the script in the script system
        * @param component ScriptComponent that contains all stuff
-       * @param data Dictionary with the script serialized data
+       * @param data DataProxy with the script serialized data
        */
-      bool fillComponentData(ScriptComponent* component, const Dictionary& data);
+      bool fillComponentData(ScriptComponent* component, const DataProxy& data);
 
       /**
        * Initialize script system with the specified lua state

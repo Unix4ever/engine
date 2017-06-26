@@ -47,39 +47,21 @@ extern "C" {
 #include "lua/LuaEventProxy.h"
 #include "lua/LuaHelpers.h"
 
-#include "Dictionary.h"
-
-#include "sol.hpp"
-
 namespace Gsage {
 
-  void fillRecoursively(const sol::object& t, Dictionary& dest) {
-    if(t.get_type() == sol::type::table) {
-      for(auto pair : t.as<sol::table>()) {
-        Dictionary d;
-        fillRecoursively(pair.second, d);
-
-        if(pair.first.get_type() == sol::type::number) {
-          dest.push(d);
-        } else {
-          dest.put(pair.first.as<std::string>(), d);
-        }
-      }
-    } else {
-      dest.set(t.as<std::string>());
-    }
+  void fillRecoursively(const sol::object& t, DataProxy& dest) {
   }
 
-  std::shared_ptr<Dictionary> wrapObject(const sol::object& t)
+  std::shared_ptr<DataProxy> wrapObject(const sol::object& t)
   {
-    Dictionary* d = new Dictionary();
-    fillRecoursively(t, *d);
-    return std::shared_ptr<Dictionary>(d);
+    sol::table table = t.as<sol::table>();
+    DataProxy* d = new DataProxy(DataProxy::wrap(table));
+    return std::shared_ptr<DataProxy>(d);
   }
 
-  Dictionary getDictionaryKey(const Dictionary& d, const std::string& key)
+  DataProxy getDataProxyKey(const DataProxy& d, const std::string& key)
   {
-    return d.get(key, Dictionary());
+    return d.get(key, DataProxy());
   }
 
   DataManagerProxy::DataManagerProxy(GameDataManager* instance)
@@ -91,7 +73,7 @@ namespace Gsage {
   {
   }
 
-  Entity* DataManagerProxy::createEntity(const std::string& templateFile, Dictionary params)
+  Entity* DataManagerProxy::createEntity(const std::string& templateFile, DataProxy params)
   {
     return mInstance->createEntity(templateFile, params);
   }
@@ -211,15 +193,6 @@ namespace Gsage {
     lua["EntityProxy"]["stats"] = &EntityProxy::getComponent<StatsComponent>;
     lua["EntityProxy"]["script"] = &EntityProxy::getComponent<ScriptComponent>;
 
-    lua.new_usertype<Dictionary>("Dictionary",
-        sol::meta_function::construct, sol::factories(wrapObject),
-        sol::meta_function::index, &getDictionaryKey,
-        "int", &Dictionary::as<int>,
-        "str", &Dictionary::as<std::string>,
-        "float", &Dictionary::as<float>,
-        "bool", &Dictionary::as<bool>
-    );
-
     // --------------------------------------------------------------------------------
     // Systems
 
@@ -251,6 +224,7 @@ namespace Gsage {
           (const float(StatsComponent::*)(const std::string&)) &StatsComponent::getStat<float>,
           (const float(StatsComponent::*)(const std::string&, const float&)) &StatsComponent::getStat<float>
         ),
+        "data", sol::property(&StatsComponent::data),
         "set", sol::overload(
           &StatsComponent::setStat<bool>,
           &StatsComponent::setStat<std::string>,
@@ -280,7 +254,7 @@ namespace Gsage {
     lua.new_usertype<DataManagerProxy>("DataManager",
         "createEntity", sol::overload(
           (Entity*(DataManagerProxy::*)(const std::string&))&DataManagerProxy::createEntity,
-          (Entity*(DataManagerProxy::*)(const std::string&, Dictionary))&DataManagerProxy::createEntity
+          (Entity*(DataManagerProxy::*)(const std::string&, DataProxy))&DataManagerProxy::createEntity
         )
     );
 

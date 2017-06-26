@@ -24,7 +24,7 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "DictionaryConverters.h"
+#include "OgreConverters.h"
 
 namespace Gsage {
   inline float fromHex(const unsigned int& value, const int& offset)

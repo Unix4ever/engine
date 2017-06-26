@@ -5,13 +5,16 @@ set(TEST_DEPENDENCIES
   GsageCore
   gtest
   ${JSONCPP_LIBRARIES}
+  ${LUAJIT_LIBRARIES}
 )
 
 include_directories(
   include
   ${gsage_SOURCE_DIR}/GsageCore/include
+  ${gsage_SOURCE_DIR}/Components/Sol2/include
   ${gsage_SOURCE_DIR}/googletest/googletest/include
 
+  ${LUAJIT_INCLUDE_DIR}
   ${JSONCPP_INCLUDE_DIR}
 )
 
@@ -21,10 +24,11 @@ set(TEST_FILES
   Core/TestEngine.cpp
   Core/TestEventDispatcher.cpp
   Core/TestSerializable.cpp
-  Core/TestSerializer.cpp
+  Core/TestDataProxy.cpp
   Core/TestDictionary.cpp
   Core/TestGsageFacade.cpp
-  Core/TestFileLoader.cpp)
+  Core/TestFileLoader.cpp
+)
 
 if(${OGRE_FOUND})
   include_directories(

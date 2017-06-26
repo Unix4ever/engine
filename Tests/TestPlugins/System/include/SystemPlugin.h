@@ -49,7 +49,7 @@ namespace Gsage {
       {
       }
 
-      bool initialize(const Dictionary& config)
+      bool initialize(const DataProxy& config)
       {
         EngineSystem::initialize(config);
         mSetting = config.get<bool>("testSetting", false);
@@ -60,7 +60,7 @@ namespace Gsage {
       {
       }
 
-      EntityComponent* createComponent(const Dictionary& data, Entity* owner)
+      EntityComponent* createComponent(const DataProxy& data, Entity* owner)
       {
         return 0;
       }

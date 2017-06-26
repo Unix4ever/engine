@@ -95,16 +95,16 @@ namespace Gsage {
     lookAt(position, NONE);
   }
 
-  Dictionary RenderComponent::getAnimations()
+  DataProxy RenderComponent::getAnimations()
   {
-    Dictionary value;
+    DataProxy value;
     mAnimationScheduler.dump(value);
     return value;
   }
 
-  Dictionary RenderComponent::getRootNode()
+  DataProxy RenderComponent::getRootNode()
   {
-    Dictionary value;
+    DataProxy value;
     if(mRootNode && mRootNode->hasNode())
       mRootNode->dump(value);
 
@@ -162,12 +162,12 @@ namespace Gsage {
   }
 
 
-  void RenderComponent::setResources(const Dictionary& dict)
+  void RenderComponent::setResources(const DataProxy& dict)
   {
     mResources = dict;
   }
 
-  const Dictionary& RenderComponent::getResources() const
+  const DataProxy& RenderComponent::getResources() const
   {
     return mResources;
   }

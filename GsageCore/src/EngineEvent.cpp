@@ -59,7 +59,7 @@ namespace Gsage {
   {
   }
 
-  SettingsEvent::SettingsEvent(const std::string& type, const Dictionary& settings)
+  SettingsEvent::SettingsEvent(const std::string& type, const DataProxy& settings)
     : Event(type)
     , settings(settings)
   {

@@ -1,6 +1,6 @@
-#ifndef _Serializer_H_
-#define _Serializer_H_
-
+#ifndef _DataProxyConverters_H_
+#define _DataProxyConverters_H_
+#
 /*
 -----------------------------------------------------------------------------
 This file is a part of Gsage engine
@@ -26,75 +26,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
-
-#include <json/json.h>
-
+#include <OgreCommon.h>
+#include <OgreImage.h>
+#include <OgreVector3.h>
+#include <OgreColourValue.h>
+#include <OgreQuaternion.h>
+#include "DataProxy.h"
 
 namespace Gsage {
-
-  struct NotFound {
-    // no writer found
-  };
-
-  template<class T>
-  struct Preprocessor {
-    typedef NotFound type;
-  };
-
-  template<class T>
-  struct Writer {
-    typedef NotFound type;
-  };
-
-  struct JsonValueWriter {
-    bool write(const std::string& key, const int& src, Json::Value& dst)
-    {
-      dst[key] = src;
-      return true;
-    }
-  };
-
-  template<>
-  struct Writer<Json::Value> {
-    typedef JsonValueWriter type;
-  };
-
-  template<class T>
-  class Serializer
-  {
-    public:
-      Serializer() {};
-      virtual ~Serializer() {};
-
-      template<class F, class C>
-      bool write(const F& src, C& dest)
-      {
-        return false;
-      }
-
-      template<class F, class C>
-      bool write(const std::string& key, const T& src, C& dest)
-      {
-        return false;
-      }
-  };
-
-  class SerializationFactory
-  {
-    public:
-      template<class T, class C>
-      static const T& create(C& src)
-      {
-        return Serializer<T>::read(src);
-      }
-
-      template<class T, class C>
-      static bool dump(const T& src, C& dst)
-      {
-        Serializer<T> s;
-        return s.template dump<C>(src, dst);
-      }
-  };
+  TYPE_CASTER(OgreDegreeCaster, Ogre::Degree, std::string);
+  TYPE_CASTER(OgreColourValueCaster, Ogre::ColourValue, std::string);
+  TYPE_CASTER(OgreVector3Caster, Ogre::Vector3, std::string);
+  TYPE_CASTER(OgreQuaternionCaster, Ogre::Quaternion, std::string);
+  TYPE_CASTER(OgreFloatRectCaster, Ogre::FloatRect, std::string);
+  TYPE_CASTER(OgrePixelFormatCaster, Ogre::PixelFormat, std::string);
 }
 
 #endif

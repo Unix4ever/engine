@@ -338,7 +338,7 @@ namespace Gsage {
   {
   }
 
-  bool LuaCameraController::read(const Dictionary& dict)
+  bool LuaCameraController::read(const DataProxy& dict)
   {
     // read all all parameters
     bool res = CameraController::read(dict);
@@ -377,7 +377,7 @@ namespace Gsage {
   // ---------------------------------------------------------------------------------------------------------------
 
   template<typename TController>
-  CameraController* ConcreteControllerFactory<TController>::create(const Dictionary& settings, OgreRenderSystem* renderSystem, Engine* engine)
+  CameraController* ConcreteControllerFactory<TController>::create(const DataProxy& settings, OgreRenderSystem* renderSystem, Engine* engine)
   {
     TController* res = new TController();
     res->initialize(renderSystem, engine);
@@ -410,7 +410,7 @@ namespace Gsage {
     mControllerFactories[TController::TYPE] = new ConcreteControllerFactory<TController>();
   }
 
-  CameraController* CameraFactory::initializeController(const Dictionary& settings, OgreRenderSystem* renderSystem, Engine* engine)
+  CameraController* CameraFactory::initializeController(const DataProxy& settings, OgreRenderSystem* renderSystem, Engine* engine)
   {
     auto pair = settings.get<std::string>("type");
     if(!pair.second)

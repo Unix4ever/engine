@@ -54,7 +54,7 @@ namespace Gsage {
 
   bool SceneNodeWrapper::initialize(
           OgreObjectManager* objectManager,
-          const Dictionary& dict,
+          const DataProxy& dict,
           const std::string& ownerId,
           const std::string& type,
           Ogre::SceneManager* sceneManager,
@@ -127,7 +127,7 @@ namespace Gsage {
     return mNode != 0 ? mNode->getOrientation() : Ogre::Quaternion();
   }
 
-  void SceneNodeWrapper::readChildren(const Dictionary& dict)
+  void SceneNodeWrapper::readChildren(const DataProxy& dict)
   {
     for(auto& pair : dict)
     {
@@ -152,14 +152,14 @@ namespace Gsage {
     }
   }
 
-  Dictionary SceneNodeWrapper::writeChildren()
+  DataProxy SceneNodeWrapper::writeChildren()
   {
-    Dictionary values;
+    DataProxy values;
     for(auto& pair : mChildren)
     {
       for(auto& childPair : pair.second)
       {
-        Dictionary item;
+        DataProxy item;
         childPair.second->dump(item);
         values.push(item);
       }
@@ -234,12 +234,26 @@ namespace Gsage {
     }
   }
 
-  OgreObject* SceneNodeWrapper::getChild(const std::string& type, const std::string& name)
+  OgreObject* SceneNodeWrapper::getChild(const std::string& type, const std::string& name, bool traverse)
   {
-    if(mChildren.count(type) == 0 || mChildren[type].count(name) == 0)
+    std::string key = name;
+    SceneNodeWrapper* child = this;
+    if(traverse) {
+      std::vector<std::string> parts = split(name, '.');
+      for(auto iter = parts.begin(); iter != parts.end() - 1; iter++) {
+        SceneNodeWrapper* tmp = child->getChildOfType<SceneNodeWrapper>(*iter);
+        if(!tmp) {
+          return 0;
+        }
+        child = tmp;
+      }
+      key = parts[parts.size() - 1];
+    }
+
+    if(child->mChildren.count(type) == 0 || child->mChildren[type].count(key) == 0)
       return 0;
 
-    return mChildren[type][name];
+    return child->mChildren[type][key];
   }
 
   void SceneNodeWrapper::pitch(const Ogre::Radian &angle, Ogre::Node::TransformSpace relativeTo)

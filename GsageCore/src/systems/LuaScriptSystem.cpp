@@ -57,20 +57,25 @@ namespace Gsage {
     }
   }
 
-  bool LuaScriptSystem::initialize(const Dictionary& settings) {
+  bool LuaScriptSystem::initialize(const DataProxy& settings) {
     mWorkdir = mEngine->env().get("workdir", ".");
     EngineSystem::initialize(settings);
     return true;
   }
 
-  bool LuaScriptSystem::fillComponentData(ScriptComponent* component, const Dictionary& data)
+  bool LuaScriptSystem::fillComponentData(ScriptComponent* component, const DataProxy& data)
   {
     bool createdComponent = ComponentStorage<ScriptComponent>::fillComponentData(component, data);
     if(!createdComponent)
       return false;
 
+
     if(component->getBehavior().empty())
+    {
+      sol::table t = mState->create_table();
+      component->setData(t);
       return true;
+    }
 
     if(mState)
     {
@@ -78,6 +83,7 @@ namespace Gsage {
       sol::table btree = initializeBtree(component->getOwner()->getId(), component->getBehavior());
       component->setBtree(btree);
       sol::table context = btree["context"];
+
       component->setData(context);
 
       LOG(INFO) << "Successfuly registered script component for entity " << component->getOwner()->getId();

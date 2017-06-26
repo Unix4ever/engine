@@ -43,9 +43,9 @@ function startup()
   console:AddEventListener('keydown', onKeyEvent, true)
 end
 
-function setActiveCamera(id)
+function setActiveCamera(id, cameraID)
   local camera = entity.get(id)
-  camera:render().root:getCamera(id):attach(core:render().viewport)
+  camera:render().root:getCamera(cameraID):attach(core:render().viewport)
 end
 
 function spawnMore(count)
@@ -55,12 +55,7 @@ function spawnMore(count)
 end
 
 function spawn()
-  entity.create("ninja",
-  Dictionary.new({
-    movement = {
-      speed = 10
-    }
-  }))
+  entity.create("ninja", {movement = {speed = 10}})
 end
 
 function onKeyEvent(event)

@@ -51,7 +51,7 @@ namespace Gsage {
 
   bool OgreObject::initialize(
           OgreObjectManager* objectManager,
-          const Dictionary& dict,
+          const DataProxy& dict,
           const std::string& ownerId,
           const std::string& type,
           Ogre::SceneManager* sceneManager,
@@ -65,7 +65,7 @@ namespace Gsage {
 
   bool OgreObject::initialize(
           OgreObjectManager* objectManager,
-          const Dictionary& dict,
+          const DataProxy& dict,
           const std::string& ownerId,
           const std::string& type,
           Ogre::SceneManager* sceneManager,

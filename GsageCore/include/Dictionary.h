@@ -31,6 +31,7 @@ THE SOFTWARE.
 #include <type_traits>
 #include <iterator>
 #include <algorithm>
+#include "DataProxy.h"
 
 namespace Gsage {
   class DictionaryKey;
@@ -38,23 +39,6 @@ namespace Gsage {
 }
 std::ostream & operator<<(std::ostream & os, Gsage::DictionaryKey const & key);
 std::ostream & operator<<(std::ostream & os, Gsage::Dictionary const & dict);
-
-#include "Logger.h"
-#include <tuple>
-#include <stdexcept>
-#include "Any.h"
-
-
-#define TYPE_CASTER(name, t, f) \
-struct name {\
-  typedef t Type;\
-  typedef f FromType;\
-  bool to(const std::string& src, Type& dst) const;\
-  const f from(const Type& value) const;\
-};\
-template<> \
-struct TranslatorBetween<f, t> { typedef name type; }; \
-
 
 #define _OVERRIDE_KEY_OPERATOR(op) \
   friend bool operator op(const DictionaryKey& k1, const DictionaryKey& k2) { \
@@ -64,6 +48,9 @@ struct TranslatorBetween<f, t> { typedef name type; }; \
     return k1.mIndex op k2.mIndex;\
   }\
 
+#include "Logger.h"
+#include <tuple>
+#include <stdexcept>
 
 namespace Gsage {
   namespace detail {
@@ -248,79 +235,6 @@ namespace Gsage {
   };
 
   /**
-   * CastException is raised when it's impossible to get value as<something>.
-   */
-  class CastException: public std::exception
-  {
-    virtual const char* what() const throw()
-    {
-      return "Failed to cast value";
-    }
-  };
-
-  /**
-   * NoopCaster does not do any cast.
-   *
-   * Implements behavior when no caster is found for the requested type.
-   */
-  template<class F, class T>
-  struct NoopCaster
-  {
-    /**
-     * Noop.
-     */
-    typedef T Type;
-    typedef F FromType;
-    bool to(const FromType& src, Type& dst)
-    {
-      return false;
-    }
-    /**
-     * Noop.
-     */
-    const F from(const Type& value)
-    {
-      return "";
-    }
-  };
-
-  /**
-   * Wrapper for Casters.
-   */
-  template<typename F, typename T>
-  struct TranslatorBetween
-  {
-    typedef NoopCaster<F, T> type;
-  };
-
-  TYPE_CASTER(DoubleCaster, double, std::string)
-  TYPE_CASTER(IntCaster, int, std::string)
-  TYPE_CASTER(UIntCaster, unsigned int, std::string)
-  TYPE_CASTER(UlongCaster, unsigned long, std::string)
-  TYPE_CASTER(FloatCaster, float, std::string)
-  TYPE_CASTER(BoolCaster, bool, std::string)
-  TYPE_CASTER(StringCaster, std::string, std::string)
-
-  /**
-   * Const string caster.
-   */
-  struct CStrCaster {
-    typedef const char* Type;
-    typedef std::string FromType;
-    bool to(const FromType& src, Type& dst) const;
-    const FromType from(const Type& value) const;
-  };
-
-  /**
-   * Wraps CStrCaster.
-   */
-  template<size_t N>
-  struct TranslatorBetween<std::string, char[N]>
-  {
-    typedef CStrCaster type;
-  };
-
-  /**
    * Variable type dictionary.
    *
    * Stores all values as strings.
@@ -351,8 +265,8 @@ namespace Gsage {
       typedef DictionaryKey key_type;
       typedef std::pair<DictionaryKey, Dictionary> value_type;
 
-      Dictionary(bool isArray = false) : mIsArray(isArray), mChildren(new Children()), mPolicy(0) {}
-      Dictionary(const std::string& data, bool isArray = false) : mIsArray(isArray), mChildren(new Children()), mPolicy(0) { }
+      Dictionary(bool isArray = false) : mIsArray(isArray), mChildren(new Children()) {}
+      Dictionary(const std::string& data, bool isArray = false) : mIsArray(isArray), mChildren(new Children()) { }
 
       virtual ~Dictionary() {}
 
@@ -655,7 +569,6 @@ namespace Gsage {
 
       std::shared_ptr<Children> mChildren;
       std::string mValue;
-      detail::AccessPolicy* mPolicy;
       bool mIsArray;
   };
 

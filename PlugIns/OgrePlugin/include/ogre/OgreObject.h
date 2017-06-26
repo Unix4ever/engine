@@ -27,7 +27,7 @@ THE SOFTWARE.
 #ifndef _OgreObject_H_
 #define _OgreObject_H_
 
-#include "DictionaryConverters.h"
+#include "OgreConverters.h"
 #include "Serializable.h"
 
 namespace Ogre
@@ -50,7 +50,7 @@ namespace Gsage {
 
       virtual bool initialize(
           OgreObjectManager* objectManager,
-          const Dictionary& dict,
+          const DataProxy& dict,
           const std::string& ownerId,
           const std::string& type,
           Ogre::SceneManager* sceneManager,
@@ -59,7 +59,7 @@ namespace Gsage {
       /**
        * Initialize element from the node with values
        * @param factory OgreObjectManager to enable child class creation
-       * @param dict Dictionary with values
+       * @param dict DataProxy with values
        * @param type String type of the object
        * @param parent Parent SceneNode
        * @param sceneManager SceneManager to use
@@ -67,7 +67,7 @@ namespace Gsage {
        */
       virtual bool initialize(
           OgreObjectManager* objectManager,
-          const Dictionary& dict,
+          const DataProxy& dict,
           const std::string& ownerId,
           const std::string& type,
           Ogre::SceneManager* sceneManager,
@@ -91,6 +91,17 @@ namespace Gsage {
        * @param object Object to attach
        */
       void attachObject(Ogre::MovableObject* object);
+
+      /*class Metadata : public ObjectFactory::Metadata {
+        public:
+          void registerMetadata(ObjectFactory* factory) {
+            factory->add("OgreObject",
+                ObjectFactory::bases(),
+                "type", ObjectFactory::Property(&OgreObject::mType, ObjectFactory::Priority(10000)),
+                "name", ObjectFactory::Property(&OgreObject::mObjectId, ObjectFactory::Priority(10000)),
+            )
+          }
+      };*/
     protected:
       std::string mObjectId;
       std::string mOwnerId;

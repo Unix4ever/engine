@@ -118,7 +118,7 @@ namespace Gsage {
     return mObject ? mObject->getCastShadows() : false;
   }
 
-  void EntityWrapper::attachToBone(const std::string& boneId, const std::string& entityId, Dictionary movableObjectData)
+  void EntityWrapper::attachToBone(const std::string& boneId, const std::string& entityId, DataProxy movableObjectData)
   {
     if(!mObject)
       return;

@@ -6,6 +6,8 @@ local function moveRandomly(self, context)
     0,
     self:render().position.z + math.random(30) - 15
   )
+
+  context.nowhere = "AADSDAD"
   self:movement():go(position)
 end
 

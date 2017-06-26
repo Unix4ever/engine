@@ -144,11 +144,11 @@ namespace Gsage {
       /**
        * Reads component root node
        */
-      Dictionary getRootNode();
+      DataProxy getRootNode();
       /**
        * Reads component animations
        */
-      Dictionary getAnimations();
+      DataProxy getAnimations();
 
       /**
        * Get root SceneNodeWrapper
@@ -156,15 +156,15 @@ namespace Gsage {
       SceneNodeWrapper* getRoot();
 
       /**
-       * Read additional resources paths from the Dictionary
-       * @param resources Dictionary with all resources settings
+       * Read additional resources paths from the DataProxy
+       * @param resources DataProxy with all resources settings
        */
-      void setResources(const Dictionary& resources);
+      void setResources(const DataProxy& resources);
 
       /**
        * Get resources
        */
-      const Dictionary& getResources() const;
+      const DataProxy& getResources() const;
     private:
       friend class OgreRenderSystem;
       bool mAddedToScene;
@@ -172,7 +172,7 @@ namespace Gsage {
       AnimationScheduler mAnimationScheduler;
       SceneNodeWrapper* mRootNode;
 
-      Dictionary mResources;
+      DataProxy mResources;
   };
 }
 

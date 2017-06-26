@@ -1,10 +1,10 @@
 return function(self)
   local model = self:render().root:getEntity('sinbad')
-  local sword = Dictionary.new({
+  local sword = {
     type = 'model',
     mesh = 'Sword.mesh',
-    castShadows = 'true'
-  })
+    castShadows = true
+  }
 
   model:attachToBone('Handle.R', 's1', sword)
   model:attachToBone('Handle.L', 's2', sword)

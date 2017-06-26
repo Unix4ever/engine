@@ -130,6 +130,18 @@ namespace Gsage {
        * Get script behavior lua object
        */
       sol::table& getBtree();
+
+      /**
+       * Build initial context state
+       *
+       * @param context to update
+       */
+      void setContext(const DataProxy& context);
+
+      /**
+       * Get actual context
+       */
+      DataProxy getContext();
     private:
 
       std::string mSetupScript;
@@ -139,6 +151,7 @@ namespace Gsage {
 
       sol::table mData;
       sol::table mBtree;
+      DataProxy mUpdatedContext;
 
       bool mSetupExecuted;
       bool mTearDownExecuted;

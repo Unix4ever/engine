@@ -62,7 +62,11 @@
       }
     },
     "script": {
-      "setupScript": "@File:scripts/setup/freeCamera.lua"
+      "setupScript": "@File:scripts/setup/freeCamera.lua",
+      "context": {
+        "speed": 0.5,
+        "mouseSensivity": 0.002
+      }
     }
   }, {
     "id": "castle",

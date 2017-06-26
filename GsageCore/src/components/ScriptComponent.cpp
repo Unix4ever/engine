@@ -41,6 +41,7 @@ namespace Gsage {
     BIND_ACCESSOR_OPTIONAL("behavior", &ScriptComponent::setBehavior, &ScriptComponent::getBehavior);
     BIND_ACCESSOR_OPTIONAL("setupScript", &ScriptComponent::setSetupScript, &ScriptComponent::getSetupScript);
     BIND_ACCESSOR_OPTIONAL("tearDownScript", &ScriptComponent::setTearDownScript, &ScriptComponent::getTearDownScript);
+    BIND_ACCESSOR_OPTIONAL("context", &ScriptComponent::setContext, &ScriptComponent::getContext);
   }
 
   ScriptComponent::~ScriptComponent()
@@ -108,6 +109,10 @@ namespace Gsage {
   void ScriptComponent::setData(sol::table& data)
   {
     mData = data;
+    if(!mUpdatedContext.empty()) {
+      DataProxy dp = DataProxy::wrap(data);
+      mUpdatedContext.dump(dp);
+    }
   }
 
   sol::table& ScriptComponent::getData()
@@ -150,4 +155,15 @@ namespace Gsage {
   {
     return mHasBehavior;
   }
+
+  void ScriptComponent::setContext(const DataProxy& context)
+  {
+    mUpdatedContext = context;
+  }
+
+  DataProxy ScriptComponent::getContext()
+  {
+    return DataProxy::wrap(mData);
+  }
+
 }
