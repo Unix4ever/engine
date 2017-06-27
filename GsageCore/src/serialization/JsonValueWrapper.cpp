@@ -215,6 +215,8 @@ namespace Gsage {
       case Json::arrayValue:
         res = Type::Array;
         break;
+      default:
+        res = Type::Object;
     }
     return res;
   }
@@ -268,6 +270,8 @@ namespace Gsage {
         case Json::realValue:
           dest = typename TranslatorBetween<std::string, double>::type().from(value.asDouble());
           break;
+        default:
+          return false;
       }
     } else {
       dest = value.asString();

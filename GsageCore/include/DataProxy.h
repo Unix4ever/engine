@@ -234,9 +234,9 @@ namespace Gsage {
           const_iterator(DataWrapper::iterator* iterator);
           virtual ~const_iterator();
 
-          const reference operator*()
+          reference operator*()
           {
-            return const_cast<const reference>(*mCurrent);
+            return *(const_cast<const pointer>(mCurrent.get()));
           }
 
           const pointer operator->() {
@@ -420,6 +420,30 @@ namespace Gsage {
         putImpl(mDataWrapper, key, value);
       }
 
+      template<int T>
+      auto getWrapper() const
+      {
+        return getWrapper<T>(mDataWrapper);
+      }
+
+      template<int T>
+      auto getWrapper()
+      {
+        return getWrapper<T>(mDataWrapper);
+      }
+
+      template<int T>
+      auto getWrapper(DataWrapperPtr ptr) const
+      {
+        return static_cast<typename TypeToWrapper<T>::type*>(ptr.get());
+      }
+
+      template<int T>
+      auto getWrapper(DataWrapperPtr ptr)
+      {
+        return static_cast<typename TypeToWrapper<T>::type*>(ptr.get());
+      }
+
       /**
        * Set value.
        *
@@ -435,6 +459,8 @@ namespace Gsage {
           case DataWrapper::JSON_OBJECT:
             getWrapper<DataWrapper::JSON_OBJECT>()->set(value);
             break;
+          default:
+            LOG(WARNING) << "Can't set " << mDataWrapper->getType();
         }
       }
 
@@ -493,6 +519,8 @@ namespace Gsage {
             return getWrapper<DataWrapper::LUA_TABLE>()->read(dest);
           case DataWrapper::JSON_OBJECT:
             return getWrapper<DataWrapper::JSON_OBJECT>()->read(dest);
+          default:
+            LOG(WARNING) << "Can't read type: " << mDataWrapper->getType();
         }
         return false;
       }
@@ -567,6 +595,8 @@ namespace Gsage {
           case DataWrapper::JSON_OBJECT:
             getWrapper<DataWrapper::JSON_OBJECT>(wrapper)->put(key, value);
             break;
+          default:
+            LOG(WARNING) << "Can't put " << key << " to the wrapper of type: " << mDataWrapper->getType();
         }
       }
 
@@ -578,6 +608,8 @@ namespace Gsage {
             return getWrapper<DataWrapper::LUA_TABLE>(wrapper)->read(key, dest);
           case DataWrapper::JSON_OBJECT:
             return getWrapper<DataWrapper::JSON_OBJECT>(wrapper)->read(key, dest);
+          default:
+            LOG(WARNING) << "Can't read " << key << " of the wrapper of type: " << mDataWrapper->getType();
         }
         return false;
       }
@@ -600,30 +632,6 @@ namespace Gsage {
       const_iterator end() const
       {
         return const_iterator(mDataWrapper->end());
-      }
-
-      template<int T>
-      auto getWrapper() const
-      {
-        return getWrapper<T>(mDataWrapper);
-      }
-
-      template<int T>
-      auto getWrapper()
-      {
-        return getWrapper<T>(mDataWrapper);
-      }
-
-      template<int T>
-      auto getWrapper(DataWrapperPtr ptr) const
-      {
-        return static_cast<typename TypeToWrapper<T>::type*>(ptr.get());
-      }
-
-      template<int T>
-      auto getWrapper(DataWrapperPtr ptr)
-      {
-        return static_cast<typename TypeToWrapper<T>::type*>(ptr.get());
       }
 
       /**

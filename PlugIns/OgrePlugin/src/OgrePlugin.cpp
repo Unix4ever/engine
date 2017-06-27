@@ -247,11 +247,11 @@ namespace Gsage {
     {
       sol::state_view lua = *mLuaInterface->getSolState();
 
-      lua["Engine"]["render"] = sol::nil;
-      lua["Engine"]["movement"] = sol::nil;
+      lua["Engine"]["render"] = sol::lua_nil;
+      lua["Engine"]["movement"] = sol::lua_nil;
 
-      lua["EntityProxy"]["render"] = sol::nil;
-      lua["EntityProxy"]["movement"] = sol::nil;
+      lua["EntityProxy"]["render"] = sol::lua_nil;
+      lua["EntityProxy"]["movement"] = sol::lua_nil;
     }
 
     mFacade->getEngine()->removeSystem("render");

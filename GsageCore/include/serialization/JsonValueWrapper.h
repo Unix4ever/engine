@@ -123,7 +123,7 @@ namespace Gsage {
         }
 
         Json::ValueType jsonType = getJsonType<T>();
-        if(object.type() == jsonType || std::is_arithmetic<T>::value && object.type() != Json::stringValue) {
+        if(object.type() == jsonType || (std::is_arithmetic<T>::value && object.type() != Json::stringValue)) {
           return readValue(object, dest);
         }
 
@@ -155,7 +155,7 @@ namespace Gsage {
         }
 
         Json::ValueType jsonType = getJsonType<T>();
-        if(object.type() == jsonType || std::is_arithmetic<T>::value && object.type() != Json::stringValue) {
+        if(object.type() == jsonType || (std::is_arithmetic<T>::value && object.type() != Json::stringValue)) {
           return readValue(object, dest);
         }
 

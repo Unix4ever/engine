@@ -103,7 +103,7 @@ namespace Gsage {
       }
 
       int count(const std::string& key) const {
-        if(mObject[key] == sol::nil) {
+        if(mObject[key] == sol::lua_nil) {
           return 0;
         }
 

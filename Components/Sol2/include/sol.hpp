@@ -5311,7 +5311,7 @@ namespace sol {
 					return true;
 				}
 				type t = type_of(L, -1);
-				if (t == type::table || t == type::none || t == type::nil) {
+				if (t == type::table || t == type::none || t == type::lua_nil) {
 					lua_pop(L, 1);
 					return true;
 				}
@@ -5333,7 +5333,7 @@ namespace sol {
 					return true;
 				}
 				type t = type_of(L, -1);
-				if (t == type::table || t == type::none || t == type::nil) {
+				if (t == type::table || t == type::none || t == type::lua_nil) {
 					lua_pop(L, 1);
 					return true;
 				}
@@ -5355,7 +5355,7 @@ namespace sol {
 					return true;
 				}
 				type t = type_of(L, -1);
-				if (t == type::table || t == type::none || t == type::nil) {
+				if (t == type::table || t == type::none || t == type::lua_nil) {
 					lua_pop(L, 1);
 					return true;
 				}

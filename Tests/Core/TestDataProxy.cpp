@@ -117,7 +117,7 @@ TEST_F(TestDataProxy, TestLuaObject)
     } else {
       std::string actual_value;
       sol::object object = t[pair.first];
-      if(object == sol::nil) {
+      if(object == sol::lua_nil) {
         FAIL();
       }
 
@@ -414,6 +414,8 @@ TEST_P(TestMerge, TestMergeOperations)
       case DataWrapper::JSON_OBJECT:
         return DataProxy::create(value);
         break;
+      default:
+        return DataProxy::create(DataWrapper::JSON_OBJECT);
     }
   };
 

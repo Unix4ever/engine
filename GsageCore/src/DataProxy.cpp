@@ -105,6 +105,8 @@ namespace msgpack {
             case Gsage::DataWrapper::Bool:
               o.pack(v.getValueOptional<bool>(false));
               break;
+            default:
+              break;
             case Gsage::DataWrapper::Object:
             case Gsage::DataWrapper::Array:
               int size = 0;
@@ -122,6 +124,7 @@ namespace msgpack {
               }
               break;
           }
+          return o;
         }
       };
     } // namespace adaptor
@@ -189,6 +192,8 @@ namespace Gsage {
         throw CreateException("cannot use LUA_TABLE to create the DataProxy. Lua table can be wrapped or created by copying sol::object only.");
       case DataWrapper::JSON_OBJECT:
         return DataProxy(new typename TypeToWrapper<DataWrapper::JSON_OBJECT>::type(true));
+      default:
+        break;
     }
 
     return DataProxy();
