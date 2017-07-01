@@ -17,8 +17,8 @@
   "plugins":
   [
     "PlugIns/OisInput",
-    "PlugIns/RocketUI",
-    "PlugIns/OgrePlugin"
+    "PlugIns/OgrePlugin",
+    "PlugIns/ImGUI"
   ],
 
   "render":
