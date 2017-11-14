@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #ifdef OGRE_INTERFACE
 #include "ogre/ImguiOgreWrapper.h"
+#include "ogre/OgreView.h"
 #include "ogre/Gizmo.h"
 #endif
 
@@ -40,7 +41,7 @@ THE SOFTWARE.
 
 namespace Gsage {
 
-  void ImguiRenderer::addView(const std::string& name, sol::object view)
+  bool ImguiRenderer::addView(const std::string& name, sol::object view, bool docked)
   {
     sol::protected_function callback;
     sol::table t = view.as<sol::table>();
@@ -49,29 +50,76 @@ namespace Gsage {
 
     if (call) {
       render = [t, call] () -> sol::protected_function_result { return call.value()(t); };
+      docked = t.get_or("docked", docked);
     } else if(view.is<sol::protected_function>()) {
       callback = view.as<sol::protected_function>();
       render = [callback] () -> sol::protected_function_result { return callback(); };
     } else {
       LOG(ERROR) << "Failed to add lua object as lua view " << name << ": must be either callable or function";
-      return;
-    }
-
-    mViews[name] = render;
-  }
-
-  bool ImguiRenderer::removeView(const std::string& name)
-  {
-    if(mViews.count(name) == 0) {
       return false;
     }
 
-    mViews.erase(name);
+    if(docked){
+      mDockedViews[name] = render;
+    } else {
+      mViews[name] = render;
+    }
+
+    return true;
+  }
+
+  bool ImguiRenderer::removeView(const std::string& name, sol::object view)
+  {
+    bool docked = false;
+    auto views = &mViews;
+    if(view != sol::lua_nil) {
+      sol::table t = view.as<sol::table>();
+      if(t.get_or("docked", docked)) {
+        views = &mDockedViews;
+      }
+    }
+
+    if(views->count(name) == 0) {
+      return false;
+    }
+
+    views->erase(name);
     return true;
   }
 
   void ImguiRenderer::renderViews()
   {
+    ImGuiIO& io = ImGui::GetIO();
+    if(mDockedViews.size() > 0) {
+      ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(2.0f, 2.0f));
+      ImGui::PushStyleColor(ImGuiCol_WindowBg, ImGui::GetColorU32(ImGuiCol_Border));
+      ImVec2 size = io.DisplaySize;
+      size.y -= 30;
+      ImGui::SetNextWindowSize(size);
+      ImGui::SetNextWindowPos(ImVec2(0, 30));
+      ImGui::Begin(
+          "",
+          NULL,
+          ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus
+      );
+      ImGui::PopStyleVar();
+      igBeginWorkspace();
+      ImGui::PopStyleColor();
+      for(auto pair : mDockedViews) {
+        try {
+          auto res = pair.second();
+          if(!res.valid()) {
+            sol::error e = res;
+            LOG(ERROR) << "Failed to render view " << pair.first << ": " << e.what();
+          }
+        } catch(sol::error e) {
+          LOG(ERROR) << "Exception in view " << pair.first << ": " << e.what();
+        }
+      }
+      igEndWorkspace();
+      ImGui::End();
+    }
+
     for(auto pair : mViews) {
       try {
         auto res = pair.second();
@@ -83,6 +131,11 @@ namespace Gsage {
         LOG(ERROR) << "Exception in view " << pair.first << ": " << e.what();
       }
     }
+  }
+
+  void ImguiRenderer::setMousePosition(const std::string& name, ImVec2 position)
+  {
+    mMousePositions[name] = position;
   }
 
   ImguiManager::ImguiManager()
@@ -200,6 +253,18 @@ namespace Gsage {
     sol::state_view lua(L);
     lua["imgui"]["render"] = mRenderer;
 #ifdef OGRE_INTERFACE
+    lua["imgui"]["createOgreView"] = [this] () -> std::shared_ptr<OgreView>{
+      OgreRenderSystem* render = mEngine->getSystem<OgreRenderSystem>();
+      if(render == 0) {
+        return std::shared_ptr<OgreView>(nullptr);
+      }
+      return std::shared_ptr<OgreView>(new OgreView(render));
+    };
+    lua.new_usertype<OgreView>("OgreView",
+        "setTextureID", &OgreView::setTextureID,
+        "render", &OgreView::render
+    );
+
     lua["imgui"]["createGizmo"] = [this] () -> std::shared_ptr<Gizmo>{
       OgreRenderSystem* render = mEngine->getSystem<OgreRenderSystem>();
       if(render == 0) {
@@ -223,10 +288,8 @@ namespace Gsage {
       return true;
 
     const MouseEvent& e = static_cast<const MouseEvent&>(event);
-
+    mRenderer->setMousePosition(e.dispatcher, ImVec2(e.mouseX, e.mouseY));
     ImGuiIO& io = ImGui::GetIO();
-    io.MousePos.x = e.mouseX;
-    io.MousePos.y = e.mouseY;
     io.MouseWheel += e.relativeZ / 100;
 
     io.MouseDown[e.button] = e.getType() == MouseEvent::MOUSE_DOWN;
@@ -272,6 +335,6 @@ namespace Gsage {
 
   bool ImguiManager::doCapture()
   {
-    return ImGui::IsMouseHoveringAnyWindow();
+    return ImGui::GetIO().WantCaptureMouse;
   }
 }

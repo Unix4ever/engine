@@ -28,6 +28,8 @@ THE SOFTWARE.
 #include "ogre/SceneNodeWrapper.h"
 #include "systems/OgreRenderSystem.h"
 
+#include "RenderTarget.h"
+
 #include <imgui.h>
 
 namespace Gsage {
@@ -45,13 +47,18 @@ namespace Gsage {
   {
   }
 
-  void Gizmo::render()
+  void Gizmo::render(float x, float y, const std::string& rtName)
   {
     if(mTarget == nullptr || !mEnabled) {
       return;
     }
 
-    Ogre::Camera* cam = mRenderSystem->getViewport()->getCamera();
+    RenderTargetPtr renderTarget = mRenderSystem->getRenderTarget(rtName);
+    if(renderTarget == nullptr) {
+      return;
+    }
+
+    Ogre::Camera* cam = renderTarget->getCamera();
     Ogre::Matrix4 view = cam->getViewMatrix();
     Ogre::Matrix4 projection = cam->getProjectionMatrix();
 
@@ -79,8 +86,7 @@ namespace Gsage {
 
     ImGuizmo::BeginFrame();
     ImGuizmo::Enable(mEnabled);
-    ImGuiIO& io = ImGui::GetIO();
-    ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
+    ImGuizmo::SetRect(x, y, renderTarget->getWidth(), renderTarget->getHeight());
     float delta[16] = {0.f};
 
     ImGuizmo::Manipulate(&v[0], &p[0], mOperation, mMode, &mModelMatrix[0], &delta[0]);
@@ -102,6 +108,7 @@ namespace Gsage {
       node->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(deltaRotation[1]), Ogre::SceneNode::TS_WORLD);
       node->rotate(Ogre::Vector3::UNIT_Z, Ogre::Degree(deltaRotation[2]), Ogre::SceneNode::TS_WORLD);
     }
+    ImGuizmo::EndFrame();
   }
 
   void Gizmo::enable(bool value)

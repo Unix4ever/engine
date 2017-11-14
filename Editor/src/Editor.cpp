@@ -2,7 +2,7 @@
 -----------------------------------------------------------------------------
 This file is a part of Gsage engine
 
-Copyright (c) 2014-2016 Artem Chernyshev
+Copyright (c) 2014-2017 Gsage Authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,11 @@ THE SOFTWARE.
 */
 
 #include "Editor.h"
+#include "sol.hpp"
+#include "Logger.h"
+#include "FileLoader.h"
+
+#define GLOBAL_STATE_FILE "workspace.json"
 
 namespace Gsage {
 
@@ -34,6 +39,33 @@ namespace Gsage {
 
   Editor::~Editor()
   {
+    saveGlobalState();
+  }
+
+  bool Editor::initialize(const std::string& resourceFolder)
+  {
+    mResourcePath = resourceFolder;
+    if(!FileLoader::getSingletonPtr()->load(mResourcePath + "/" + GLOBAL_STATE_FILE, DataProxy(), mGlobalEditorState)) {
+      LOG(WARNING) << "No saved global state";
+    }
+
+    return true;
+  }
+
+  const DataProxy& Editor::getGlobalState() const
+  {
+    return mGlobalEditorState;
+  }
+
+  void Editor::putToGlobalState(const std::string& name, DataProxy data)
+  {
+    mGlobalEditorState.put(name, data);
+  }
+
+  bool Editor::saveGlobalState()
+  {
+    FileLoader::getSingletonPtr()->dump(mResourcePath + "/" + GLOBAL_STATE_FILE, mGlobalEditorState);
+    return true;
   }
 
 }

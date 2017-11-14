@@ -183,7 +183,7 @@ namespace Gsage {
 
     lua.new_usertype<GsageFacade>("Facade",
         "new", sol::no_constructor,
-        "halt", &GsageFacade::halt,
+        "shutdown", &GsageFacade::shutdown,
         "reset", &GsageFacade::reset,
         "loadSave", &GsageFacade::loadSave,
         "dumpSave", &GsageFacade::dumpSave,
@@ -360,6 +360,13 @@ namespace Gsage {
         "DELETE", sol::var(EntityEvent::DELETE)
     );
 
+    registerEvent<EngineEvent>("EngineEvent",
+        "onEngine",
+        sol::base_classes, sol::bases<Event>(),
+        "STOPPING", sol::var(EngineEvent::STOPPING),
+        "SHUTDOWN", sol::var(EngineEvent::SHUTDOWN)
+    );
+
     lua.create_table("Keys");
 
     lua["Keys"]["Ctrl"] = KeyboardEvent::Ctrl;
@@ -523,6 +530,8 @@ namespace Gsage {
         "relZ", sol::readonly(&MouseEvent::relativeZ),
         "width", sol::readonly(&MouseEvent::width),
         "height", sol::readonly(&MouseEvent::height),
+        "dispatcher", sol::readonly(&MouseEvent::dispatcher),
+
         "MOUSE_DOWN", sol::var(MouseEvent::MOUSE_DOWN),
         "MOUSE_UP", sol::var(MouseEvent::MOUSE_UP),
         "MOUSE_MOVE", sol::var(MouseEvent::MOUSE_MOVE)

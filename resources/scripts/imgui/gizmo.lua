@@ -67,5 +67,7 @@ function Gizmo:__call()
     self.gizmo.mode = imgui.gizmo.WORLD
   end
   imgui.End()
-  self.gizmo:render()
+
+  local width, height = imgui.GetWindowSize()
+  self.gizmo:render(0, 0, width, height)
 end

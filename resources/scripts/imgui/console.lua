@@ -59,12 +59,11 @@ function LogEntry:draw()
 end
 
 -- lua/logs console
-Console = class(function(self, maxInput)
+Console = class(ImguiWindow, function(self, maxInput, docked)
+  ImguiWindow.init(self, "lua console", docked, true)
   self.history = {}
   self.historyPos = 0
   self.prevHistoryPos = 0
-  self.open = false
-  self.title = "Lua Console"
   self.scrollToBottom = true
   self.maxInput = maxInput or 256
   self.commandLine = imgui.TextBuffer(self.maxInput)
@@ -158,9 +157,10 @@ function Console:handleCommandLineCallback(data)
 end
 
 function Console:__call()
-  local _, open = imgui.Begin(self.title, self.open)
-  if not open then
-    imgui.End()
+  local imguiBegin, imguiEnd
+
+  open = self:imguiBegin()
+  if not self.open then
     return
   end
 
@@ -217,6 +217,9 @@ function Console:__call()
         self:err(err)
       end
       self.historyPos = 0
+      if text == "hello" then
+        self:debug("Oh hello there! :)")
+      end
     end
 
     if imgui.IsItemHovered() or imgui.IsRootWindowOrAnyChildFocused() and not imgui.IsAnyItemActive() and not imgui.IsMouseClicked(0) then
@@ -224,7 +227,7 @@ function Console:__call()
     end
   end
 
-  imgui.End()
+  self:imguiEnd()
 end
 
 -- executeLua string

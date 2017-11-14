@@ -30,6 +30,7 @@ THE SOFTWARE.
 #include "UIManager.h"
 #include "EventSubscriber.h"
 #include "KeyboardEvent.h"
+#include "ImGuiDock.h"
 
 #include "sol.hpp"
 
@@ -50,16 +51,30 @@ namespace Gsage {
        *
        * @param name view name
        * @param view lua protected function that will render everything.
+       * @param docked view is docked
        */
-      void addView(const std::string& name, sol::object view);
+      bool addView(const std::string& name, sol::object view, bool docked = false);
 
       /**
        * Remove named view
        *
        * @param name view name
+       * @param view view object
        * @returns true if the view was removed
        */
-      bool removeView(const std::string& name);
+      bool removeView(const std::string& name, sol::object view);
+      /**
+       * Start Dockspace
+       */
+      void initializeDockspace();
+
+      /**
+       * Update mouse position for the render target
+       *
+       * @param name render target name
+       * @param position mouse position
+       */
+      void setMousePosition(const std::string& name, ImVec2 position);
     protected:
       virtual void renderViews();
 
@@ -68,6 +83,10 @@ namespace Gsage {
       typedef std::map<std::string, RenderView> Views;
 
       Views mViews;
+
+      Views mDockedViews;
+
+      std::map<std::string, ImVec2> mMousePositions;
   };
 
   class ImguiManager : public UIManager, public EventSubscriber<ImguiManager>
@@ -102,13 +121,14 @@ namespace Gsage {
        * SystemChangeEvent::SYSTEM_ADDED and SystemChangeEvent::SYSTEM_REMOVED handler
        */
       bool handleSystemChange(EventDispatcher* sender, const Event& event);
-    private:
       /**
        * Handle mouse event from engine
        *
+       * @param sender EventDispatcher
        * @param event Event
        */
       bool handleMouseEvent(EventDispatcher* sender, const Event& event);
+    private:
       /**
        * Handle keyboard event from engine
        */
@@ -125,7 +145,6 @@ namespace Gsage {
       ImguiRenderer* mRenderer;
 
       bool mIsSetUp;
-
   };
 }
 #endif

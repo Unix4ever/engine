@@ -25,10 +25,10 @@
 
   "plugins":
   [
-    "@PLUGINS_DIRECTORY@/SDL",
     "@PLUGINS_DIRECTORY@/OgrePlugin",
+    "@PLUGINS_DIRECTORY@/ImGUI",
     "@PLUGINS_DIRECTORY@/RocketUI",
-    "@PLUGINS_DIRECTORY@/ImGUI"
+    "@PLUGINS_DIRECTORY@/SDL"
   ],
 
   "render":
@@ -58,14 +58,19 @@
 
     "window":
     {
+      "autoUpdated": false,
+      "viewport": {
+        "renderQueueSequence": [0, 5, 25, 50, 100, {"id": 101, "suppressShadows": true}],
+        "backgroundColor": "#000000"
+      },
       "name": "Game",
-      "width": 1280,
-      "height": 800,
+      "width": 1920,
+      "height": 1200,
       "useWindowManager": true,
       "resizable": true,
       "params":
       {
-        "FSAA": 16,
+        "FSAA": 0,
         "displayFrequency": 50,
         "vsync": false
       }

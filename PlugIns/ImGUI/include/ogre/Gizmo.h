@@ -28,6 +28,7 @@ THE SOFTWARE.
 */
 
 #include "ImGuizmo.h"
+#include <string>
 
 namespace Ogre {
   class Matrix4;
@@ -46,7 +47,7 @@ namespace Gsage {
       /**
        * Render gizmo UI
        */
-      void render();
+      void render(float x, float y, const std::string& rttName);
 
       /**
        * Enable/disable gizmo

@@ -411,8 +411,6 @@ namespace Gsage {
     lua_setglobal(L, "ImGuiWindowFlags_NoCollapse");
     lua_pushnumber(L, ImGuiWindowFlags_AlwaysAutoResize);
     lua_setglobal(L, "ImGuiWindowFlags_AlwaysAutoResize");
-    lua_pushnumber(L, ImGuiWindowFlags_ShowBorders);
-    lua_setglobal(L, "ImGuiWindowFlags_ShowBorders");
     lua_pushnumber(L, ImGuiWindowFlags_NoSavedSettings);
     lua_setglobal(L, "ImGuiWindowFlags_NoSavedSettings");
     lua_pushnumber(L, ImGuiWindowFlags_NoInputs);
@@ -427,10 +425,6 @@ namespace Gsage {
     lua_setglobal(L, "ImGuiWindowFlags_NoBringToFrontOnFocus");
     lua_pushnumber(L, ImGuiWindowFlags_ChildWindow);
     lua_setglobal(L, "ImGuiWindowFlags_ChildWindow");
-    lua_pushnumber(L, ImGuiWindowFlags_ChildWindowAutoFitX);
-    lua_setglobal(L, "ImGuiWindowFlags_ChildWindowAutoFitX");
-    lua_pushnumber(L, ImGuiWindowFlags_ChildWindowAutoFitY);
-    lua_setglobal(L, "ImGuiWindowFlags_ChildWindowAutoFitY");
     lua_pushnumber(L, ImGuiWindowFlags_ComboBox);
     lua_setglobal(L, "ImGuiWindowFlags_ComboBox");
     lua_pushnumber(L, ImGuiWindowFlags_Tooltip);
@@ -483,6 +477,8 @@ namespace Gsage {
     lua_setglobal(L, "ImGuiStyleVar_FramePadding");
     lua_pushnumber(L, ImGuiStyleVar_ItemSpacing);
     lua_setglobal(L, "ImGuiStyleVar_ItemSpacing");
+    lua_pushnumber(L, ImGuiStyleVar_WindowPadding);
+    lua_setglobal(L, "ImGuiStyleVar_WindowPadding");
     lua_pushnumber(L, ImGuiKey_Tab);
     lua_setglobal(L, "ImGuiKey_Tab");
     lua_pushnumber(L, ImGuiKey_LeftArrow);
