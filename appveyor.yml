@@ -9,7 +9,7 @@ configuration: Release
 
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/
-  - pip.exe install conan_package_tools==0.19.8  # It install conan too
+  - pip.exe install conan_package_tools==0.19.8  # It will install Conan too
   - conan remote add gsage https://api.bintray.com/conan/gsage/main --insert && conan user -p 3d14168da7de2092522ed90f72e9b6bf20db89e5 -r gsage gsage-ci
 
 # scripts to run before build
@@ -29,18 +29,13 @@ test_script:
    unit-tests.exe --gtest_output=xml:unit.xml
    functional-tests.exe -o junit --exclude-tags benchmark --no-auto-insulate -Xoutput functional.xml
 
-# scripts to run after build
-after_build:
-  - cd c:\projects\gsage\build
-  - 7z a c:\projects\gsage.zip * -tzip
-  - cd c:\projects\gsage
-
 artifacts:
-  - path: .
-    name: gsage.zip
 
-  - path: build/bin
+  - path: build/bin/test.log
     name: test.log
+
+  - path: build/sdk/.*\.msi/
+    name: gsage.msi
 
 after_test:
   - ps: |
@@ -49,3 +44,19 @@ after_test:
         Foreach-Object {
             $wc.UploadFile("https://ci.appveyor.com/api/testresults/junit/$($env:APPVEYOR_JOB_ID)", (Resolve-Path $_))
         }
+
+before_deploy:
+    cd c:\projects\gsage\build\sdk
+    packager.exe resources\editorConfig.json
+    cd ..\
+    cpack .
+
+deploy:
+  release: $(git describe --tags)
+  description: 'Windows Installer'
+  provider: GitHub
+  auth_token:
+    secure: WGF5Rq6J6dwuSQ99+Kr/ZFMquK5SOAdJw3xWUxfAe2pHsyKy9p2JFdIsI0gBH/ID
+  artifact: /.*\.msi/
+  draft: false
+  prerelease: true

@@ -43,6 +43,10 @@ THE SOFTWARE.
 #define GSAGE_VERSION_BUILD 0
 #endif
 
+#ifndef GSAGE_VERSION_PATCH
+#define GSAGE_VERSION_PATCH 0
+#endif
+
 #include <sstream>
 #include <istream>
 #include <iterator>

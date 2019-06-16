@@ -122,8 +122,18 @@ namespace Gsage {
       unsigned short configureFlags
     )
   {
+    std::string rpath = resourcePath;
+    if(!mFilesystem.exists(rpath)) {
+      rpath = "resources";
+      if(!mFilesystem.exists(rpath)) {
+        LOG(ERROR) << "Failed to find resource path";
+        return false;
+      }
+    }
+
+    LOG(DEBUG) << "Using resource path " << rpath;
     DataProxy environment;
-    environment.put("workdir", resourcePath);
+    environment.put("workdir", rpath);
     FileLoader::init(configEncoding, environment);
     DataProxy config;
     if(!FileLoader::getSingletonPtr()->load(configFile, DataProxy(), config))
@@ -134,7 +144,7 @@ namespace Gsage {
 
     LOG(INFO) << "Starting GSAGE, config:\n\t" << configFile;
 
-    return initialize(config, resourcePath, configureFlags);
+    return initialize(config, rpath, configureFlags);
   }
 
   bool GsageFacade::initialize(const DataProxy& config,
@@ -142,15 +152,24 @@ namespace Gsage {
     unsigned short configureFlags
   )
   {
+    std::string rpath = resourcePath;
+    if(!mFilesystem.exists(rpath)) {
+      rpath = "resources";
+      if(!mFilesystem.exists(rpath)) {
+        LOG(ERROR) << "Failed to find resource path";
+        return false;
+      }
+    }
+
     assert(mStarted == false);
     mStarted = true;
-    mResourcePath = resourcePath;
+    mResourcePath = rpath;
 
     addEventListener(&mEngine, EngineEvent::SHUTDOWN, &GsageFacade::onEngineShutdown);
     addEventListener(&mEngine, EngineEvent::LUA_STATE_CHANGE, &GsageFacade::onLuaStateChange);
 
     DataProxy environment;
-    environment.put("workdir", resourcePath);
+    environment.put("workdir", rpath);
 
     if(!mEngine.initialize(config, environment))
       return false;

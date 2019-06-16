@@ -13,6 +13,10 @@ macro(configure)
     set(GSAGE_VERSION_MINOR $ENV{GSAGE_VERSION_MINOR})
   endif(DEFINED ENV{GSAGE_VERSION_MINOR})
 
+  if(DEFINED ENV{GSAGE_VERSION_PATCH})
+    set(GSAGE_VERSION_PATCH $ENV{GSAGE_VERSION_PATCH})
+  endif(DEFINED ENV{GSAGE_VERSION_PATCH})
+
   if(DEFINED ENV{GSAGE_VERSION_BUILD})
     set(GSAGE_VERSION_BUILD $ENV{GSAGE_VERSION_BUILD})
   endif(DEFINED ENV{GSAGE_VERSION_BUILD})
@@ -20,7 +24,12 @@ macro(configure)
   if(WITH_METAL)
     add_definitions("-DWITH_METAL")
   endif(WITH_METAL)
-  add_definitions(-DGSAGE_VERSION_MAJOR="${GSAGE_VERSION_MAJOR}" -DGSAGE_VERSION_MINOR="${GSAGE_VERSION_MINOR}" -DGSAGE_VERSION_BUILD="${GSAGE_VERSION_BUILD}")
+  add_definitions(
+    -DGSAGE_VERSION_MAJOR="${GSAGE_VERSION_MAJOR}"
+    -DGSAGE_VERSION_MINOR="${GSAGE_VERSION_MINOR}"
+    -DGSAGE_VERSION_BUILD="${GSAGE_VERSION_BUILD}"
+    -DGSAGE_VERSION_PATCH="${GSAGE_VERSION_PATCH}"
+  )
 
   if(NOT EXISTS BINARY_OUTPUT_DIR)
     file(MAKE_DIRECTORY ${BINARY_OUTPUT_DIR})
@@ -131,6 +140,11 @@ macro(gsage_plugin plugin_name)
       LINK_FLAGS "-Wl,-F${PROJECT_BINARY_DIR}/bin/Frameworks/"
     )
   endif(APPLE)
+
+  install(TARGETS ${plugin_name}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib)
+  install(TARGETS ${plugin_name} DESTINATION "${CMAKE_INSTALL_PATH}/PlugIns")
 endmacro()
 
 macro(gsage_includes)
@@ -171,6 +185,8 @@ macro(cef_helper_app executable_name)
   if(MINGW OR UNIX)
     set(EXECUTABLE_OUTPUT_PATH "${BINARY_OUTPUT_DIR}")
   endif(MINGW OR UNIX)
+
+  install(TARGETS ${executable_name} DESTINATION "${CMAKE_INSTALL_PATH}")
 endmacro()
 
 macro(console_executable executable_name)
@@ -226,6 +242,8 @@ macro(gsage_executable_generic executable_name)
   if(MINGW OR UNIX)
     set(EXECUTABLE_OUTPUT_PATH "${BINARY_OUTPUT_DIR}")
   endif(MINGW OR UNIX)
+
+  install(TARGETS ${executable_name} DESTINATION "${CMAKE_INSTALL_PATH}")
 endmacro()
 
 macro(process_templates)
@@ -240,4 +258,30 @@ macro(process_templates)
   endif(APPLE)
   configure_file(resources/testConfig.json.in ${gsage_SOURCE_DIR}/resources/testConfig.json)
   configure_file(resources/editorConfig.json.in ${gsage_SOURCE_DIR}/resources/editorConfig.json)
+endmacro()
+
+macro(gsage_library library_name type)
+  add_library(${library_name} ${type} ${ARGN})
+  install(TARGETS ${library_name}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib/static
+  )
+
+  install(TARGETS ${library_name}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
+  )
+
+  install(TARGETS ${library_name} DESTINATION "${CMAKE_INSTALL_PATH}")
+endmacro()
+
+macro(install_includes)
+  foreach(include IN ITEMS ${ARGN})
+    install(DIRECTORY "${include}"
+            DESTINATION "${CMAKE_INSTALL_PATH}/include"
+            COMPONENT "headers"
+            FILES_MATCHING REGEX ".*")
+  endforeach(include)
 endmacro()

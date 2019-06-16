@@ -24,7 +24,7 @@ include_directories(
   ${POCO_INCLUDE_DIRS}
 )
 
-add_library(${LIB_NAME} SHARED ${headers} ${sources})
+gsage_library(${LIB_NAME} SHARED ${sources})
 
 set_target_properties(${LIB_NAME} PROPERTIES DEBUG_POSTFIX _d COMPILE_FLAGS -DGSAGE_DLL_EXPORT)
 
@@ -57,23 +57,11 @@ target_link_libraries(
   ${LIBS}
 )
 
-install(DIRECTORY include/ DESTINATION include/gsage
-  FILES_MATCHING PATTERN "*.h"
+install_includes(
+  include/
+  ${gsage_SOURCE_DIR}/Vendor/jsoncpp/include/json
+  ${gsage_SOURCE_DIR}/Vendor/Sol2/include/
 )
-
-install(DIRECTORY ${gsage_SOURCE_DIR}/Vendor/jsoncpp/include/json DESTINATION include/gsage
-  FILES_MATCHING PATTERN "*.h"
-)
-
-install(DIRECTORY ${gsage_SOURCE_DIR}/Vendor/Sol2/include/ DESTINATION include/gsage
-  FILES_MATCHING PATTERN "*.hpp"
-)
-
-install(TARGETS ${LIB_NAME}
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib/static)
-install(TARGETS ${LIB_NAME} DESTINATION "${CMAKE_INSTALL_PATH}/lib")
 
 set(APP_NAME "game")
 set(PACKAGER_NAME "packager")

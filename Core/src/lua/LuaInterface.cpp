@@ -1129,7 +1129,7 @@ namespace Gsage {
 
     std::string platform;
     std::stringstream ss;
-    ss << GSAGE_VERSION_MAJOR << "." << GSAGE_VERSION_MINOR << "." << GSAGE_VERSION_BUILD;
+    ss << GSAGE_VERSION_MAJOR << "." << GSAGE_VERSION_MINOR << "." << GSAGE_VERSION_PATCH << "." << GSAGE_VERSION_BUILD;
 #if GSAGE_PLATFORM == GSAGE_APPLE
     platform = "apple";
 #elif GSAGE_PLATFORM == GSAGE_LINUX

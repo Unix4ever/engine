@@ -15,7 +15,6 @@ ifeq ($(BUILD_TYPE),debug)
 	export CMAKE_BUILD_TYPE=Debug
 endif
 
-
 #using integration api_key/user by default
 API_KEY ?= 3d14168da7de2092522ed90f72e9b6bf20db89e5
 CONAN_USER ?= gsage-ci
