@@ -78,6 +78,8 @@ namespace Gsage
       typedef bool(*INSTALL_PLUGIN)(GsageFacade*);
       typedef bool(*UNINSTALL_PLUGIN)(GsageFacade*);
 
+      typedef std::map<size_t, UIManager*> UIManagers;
+
       /**
        * Event id dispatched when level is loaded
        */
@@ -217,7 +219,7 @@ namespace Gsage
        * @param value Abstract UI manager
        * @returns int handle of UIManager. Use it to remove UI manager from the system
        */
-      int addUIManager(UIManager* value);
+      size_t addUIManager(UIManager* value);
 
       /**
        * Get UI manager by name
@@ -227,12 +229,17 @@ namespace Gsage
       UIManager* getUIManager(const std::string& name);
 
       /**
+       * Get all ui managers, used in render system
+       */
+      inline UIManagers& getUIManagers() { return mUIManagers; }
+
+      /**
        * Remove UIManager by it's handle
        *
-       * @param handle int handle returned from addUIManager call
+       * @param handle handle returned from addUIManager call
        * @returns true if removed
        */
-      bool removeUIManager(int handle);
+      bool removeUIManager(size_t handle);
       /**
        * Stops the engine
        */
@@ -465,7 +472,6 @@ namespace Gsage
       typedef std::vector<UpdateListener*> UpdateListeners;
       UpdateListeners mUpdateListeners;
 
-      typedef std::map<long, UIManager*> UIManagers;
       UIManagers mUIManagers;
 
       int mExitCode;

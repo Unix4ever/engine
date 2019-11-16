@@ -29,6 +29,8 @@ THE SOFTWARE.
 namespace Gsage {
   const Event::Type RocketContextEvent::CREATE = "RocketContextEvent::CREATE";
 
+  const Event::Type RocketContextEvent::DESTROY = "RocketContextEvent::DESTROY";
+
   RocketContextEvent::RocketContextEvent(Event::ConstType type, const std::string& name)
     : Event(type)
     , name(name)

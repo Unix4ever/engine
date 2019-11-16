@@ -36,8 +36,9 @@
 #include <math.h>
 #include <iostream>
 #include <type_traits>
+#include "Defs.h"
 
-#define SMALL_DOUBLE 0.0000000001
+#define SMALL_REAL 0.0000000001
 
 
 /**
@@ -57,36 +58,36 @@ namespace Gsage {
     {
       struct
       {
-        double X;
-        double Y;
-        double Z;
+        Real X;
+        Real Y;
+        Real Z;
       };
-      double data[3];
+      Real data[3];
     };
 
     inline Vector3() : X(0), Y(0), Z(0) {}
-    inline Vector3(double data[]) : X(data[0]), Y(data[1]), Z(data[2])
+    inline Vector3(Real data[]) : X(data[0]), Y(data[1]), Z(data[2])
     {}
-    inline Vector3(double value) : X(value), Y(value), Z(value) {}
-    inline Vector3(double x, double y) : X(x), Y(y), Z(0) {}
-    inline Vector3(double x, double y, double z) : X(x), Y(y), Z(z) {}
+    inline Vector3(Real value) : X(value), Y(value), Z(value) {}
+    inline Vector3(Real x, Real y) : X(x), Y(y), Z(0) {}
+    inline Vector3(Real x, Real y, Real z) : X(x), Y(y), Z(z) {}
 
     static inline Vector3 Cross(Vector3 lhs, Vector3 rhs)
     {
-      double x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
-      double y = lhs.Z * rhs.X - lhs.X * rhs.Z;
-      double z = lhs.X * rhs.Y - lhs.Y * rhs.X;
+      Real x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
+      Real y = lhs.Z * rhs.X - lhs.X * rhs.Z;
+      Real z = lhs.X * rhs.Y - lhs.Y * rhs.X;
       return Vector3(x, y, z);
     }
 
-    static inline double Dot(Vector3 lhs, Vector3 rhs)
+    static inline Real Dot(Vector3 lhs, Vector3 rhs)
     {
       return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
     }
 
     static inline Vector3 Normalized(Vector3 v)
     {
-      double mag = sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
+      Real mag = sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
       if (mag == 0)
         return Vector3::Zero();
       return v / mag;
@@ -98,7 +99,7 @@ namespace Gsage {
         Vector3(v.Y, -v.X, 0) : Vector3(0, -v.Z, v.Y);
     }
 
-    static inline double SqrMagnitude(Vector3 v)
+    static inline Real SqrMagnitude(Vector3 v)
     {
       return v.X * v.X + v.Y * v.Y + v.Z * v.Z;
     }
@@ -110,7 +111,7 @@ namespace Gsage {
     return Vector3(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
   }
 
-  inline Vector3 operator*(Vector3 lhs, const double rhs)
+  inline Vector3 operator*(Vector3 lhs, const Real rhs)
   {
     return Vector3(lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs);
   }
@@ -123,11 +124,11 @@ namespace Gsage {
 namespace Gsage {
   struct Radian {
     union {
-      double value;
+      Real value;
     };
-    inline Radian(double value);
-    inline double valueDegrees() const;
-    inline double valueRadians() const;
+    inline Radian(Real value);
+    inline Real valueDegrees() const;
+    inline Real valueRadians() const;
   };
 
   struct Quaternion
@@ -136,12 +137,12 @@ namespace Gsage {
     {
       struct
       {
-        double X;
-        double Y;
-        double Z;
-        double W;
+        Real X;
+        Real Y;
+        Real Z;
+        Real W;
       };
-      double data[4];
+      Real data[4];
     };
 
 
@@ -149,16 +150,16 @@ namespace Gsage {
      * Constructors.
      */
     inline Quaternion();
-    inline Quaternion(double data[]);
-    inline Quaternion(Vector3 vector, double scalar);
-    inline Quaternion(double x, double y, double z, double w);
+    inline Quaternion(Real data[]);
+    inline Quaternion(Vector3 vector, Real scalar);
+    inline Quaternion(Real x, Real y, Real z, Real w);
 
     template<class T, std::enable_if_t<std::is_integral<T>::value>>
     inline Quaternion(T vals[]) {
-      data[0] = (double)vals[0];
-      data[1] = (double)vals[1];
-      data[2] = (double)vals[2];
-      data[3] = (double)vals[3];
+      data[0] = (Real)vals[0];
+      data[1] = (Real)vals[1];
+      data[2] = (Real)vals[2];
+      data[3] = (Real)vals[3];
     };
 
 
@@ -175,7 +176,7 @@ namespace Gsage {
      * @param b: The second quaternion.
      * @return: A scalar value.
      */
-    static inline double Angle(Quaternion a, Quaternion b);
+    static inline Real Angle(Quaternion a, Quaternion b);
 
     /**
      * Returns the conjugate of a quaternion.
@@ -190,7 +191,7 @@ namespace Gsage {
      * @param rhs: The right side of the multiplication.
      * @return: A scalar value.
      */
-    static inline double Dot(Quaternion lhs, Quaternion rhs);
+    static inline Real Dot(Quaternion lhs, Quaternion rhs);
 
     /**
      * Creates a new quaternion from the angle-axis representation of
@@ -199,7 +200,7 @@ namespace Gsage {
      * @param axis: The vector about which the rotation occurs.
      * @return: A new quaternion.
      */
-    static inline Quaternion FromAngleAxis(double angle, Vector3 axis);
+    static inline Quaternion FromAngleAxis(Real angle, Vector3 axis);
 
     /**
      * Create a new quaternion from the euler angle representation of
@@ -219,7 +220,7 @@ namespace Gsage {
      * @param z: The rotation about the z-axis in radians.
      * @return: A new quaternion.
      */
-    static inline Quaternion FromEuler(double x, double y, double z);
+    static inline Quaternion FromEuler(Real x, Real y, Real z);
 
     /**
      * Create a quaternion rotation which rotates "fromVector" to "toVector".
@@ -244,7 +245,7 @@ namespace Gsage {
      * @param b: The ending rotation.
      * @return: A new quaternion.
      */
-    static inline Quaternion Lerp(Quaternion a, Quaternion b, double t);
+    static inline Quaternion Lerp(Quaternion a, Quaternion b, Real t);
 
     /**
      * Interpolates between a and b by t. This normalizes the result when
@@ -255,7 +256,7 @@ namespace Gsage {
      * @return: A new quaternion.
      */
     static inline Quaternion LerpUnclamped(Quaternion a, Quaternion b,
-        double t);
+        Real t);
 
     /**
      * Creates a rotation with the specified forward direction. This is the
@@ -280,7 +281,7 @@ namespace Gsage {
      * @param rotation: The quaternion in question.
      * @return: A scalar value.
      */
-    static inline double Norm(Quaternion rotation);
+    static inline Real Norm(Quaternion rotation);
 
     /**
      * Returns a quaternion with identical rotation and a norm of one.
@@ -299,7 +300,7 @@ namespace Gsage {
      * @return: A new Quaternion.
      */
     static inline Quaternion RotateTowards(Quaternion from, Quaternion to,
-        double maxRadiansDelta);
+        Real maxRadiansDelta);
 
     /**
      * Returns a new quaternion interpolated between a and b, using spherical
@@ -310,7 +311,7 @@ namespace Gsage {
      * @param t: The interpolation value.
      * @return: A new quaternion.
      */
-    static inline Quaternion Slerp(Quaternion a, Quaternion b, double t);
+    static inline Quaternion Slerp(Quaternion a, Quaternion b, Real t);
 
     /**
      * Returns a new quaternion interpolated between a and b, using spherical
@@ -321,7 +322,7 @@ namespace Gsage {
      * @return: A new quaternion.
      */
     static inline Quaternion SlerpUnclamped(Quaternion a, Quaternion b,
-        double t);
+        Real t);
 
     /**
      * Outputs the angle axis representation of the provided quaternion.
@@ -329,7 +330,7 @@ namespace Gsage {
      * @param angle: The output angle.
      * @param axis: The output axis.
      */
-    static inline void ToAngleAxis(Quaternion rotation, double &angle,
+    static inline void ToAngleAxis(Quaternion rotation, Real &angle,
         Vector3 &axis);
 
     /**
@@ -349,10 +350,10 @@ namespace Gsage {
     /**
      * Operator overloading.
      */
-    inline struct Quaternion& operator+=(const double rhs);
-    inline struct Quaternion& operator-=(const double rhs);
-    inline struct Quaternion& operator*=(const double rhs);
-    inline struct Quaternion& operator/=(const double rhs);
+    inline struct Quaternion& operator+=(const Real rhs);
+    inline struct Quaternion& operator-=(const Real rhs);
+    inline struct Quaternion& operator*=(const Real rhs);
+    inline struct Quaternion& operator/=(const Real rhs);
     inline struct Quaternion& operator+=(const Quaternion rhs);
     inline struct Quaternion& operator-=(const Quaternion rhs);
     inline struct Quaternion& operator*=(const Quaternion rhs);
@@ -365,14 +366,14 @@ namespace Gsage {
   };
 
   inline Quaternion operator-(Quaternion rhs);
-  inline Quaternion operator+(Quaternion lhs, const double rhs);
-  inline Quaternion operator-(Quaternion lhs, const double rhs);
-  inline Quaternion operator*(Quaternion lhs, const double rhs);
-  inline Quaternion operator/(Quaternion lhs, const double rhs);
-  inline Quaternion operator+(const double lhs, Quaternion rhs);
-  inline Quaternion operator-(const double lhs, Quaternion rhs);
-  inline Quaternion operator*(const double lhs, Quaternion rhs);
-  inline Quaternion operator/(const double lhs, Quaternion rhs);
+  inline Quaternion operator+(Quaternion lhs, const Real rhs);
+  inline Quaternion operator-(Quaternion lhs, const Real rhs);
+  inline Quaternion operator*(Quaternion lhs, const Real rhs);
+  inline Quaternion operator/(Quaternion lhs, const Real rhs);
+  inline Quaternion operator+(const Real lhs, Quaternion rhs);
+  inline Quaternion operator-(const Real lhs, Quaternion rhs);
+  inline Quaternion operator*(const Real lhs, Quaternion rhs);
+  inline Quaternion operator/(const Real lhs, Quaternion rhs);
   inline Quaternion operator+(Quaternion lhs, const Quaternion rhs);
   inline Quaternion operator-(Quaternion lhs, const Quaternion rhs);
   inline Quaternion operator*(Quaternion lhs, const Quaternion rhs);
@@ -386,31 +387,31 @@ namespace Gsage {
    * Implementation
    */
 
-  Radian::Radian(double value) : value(value) {}
+  Radian::Radian(Real value) : value(value) {}
 
-  double Radian::valueDegrees() const {
+  Real Radian::valueDegrees() const {
     return value * 180 / M_PI;
   }
 
-  double Radian::valueRadians() const {
+  Real Radian::valueRadians() const {
     return value;
   }
 
   Quaternion::Quaternion() : X(0), Y(0), Z(0), W(1) {}
-  Quaternion::Quaternion(double data[]) : X(data[0]), Y(data[1]), Z(data[2]),
+  Quaternion::Quaternion(Real data[]) : X(data[0]), Y(data[1]), Z(data[2]),
   W(data[3]) {}
-  Quaternion::Quaternion(Vector3 vector, double scalar) : X(vector.X),
+  Quaternion::Quaternion(Vector3 vector, Real scalar) : X(vector.X),
   Y(vector.Y), Z(vector.Z), W(scalar) {}
-  Quaternion::Quaternion(double x, double y, double z, double w) : X(x), Y(y),
+  Quaternion::Quaternion(Real x, Real y, Real z, Real w) : X(x), Y(y),
   Z(z), W(w) {}
 
 
   Quaternion Quaternion::Identity() { return Quaternion(0, 0, 0, 1); }
 
 
-  double Quaternion::Angle(Quaternion a, Quaternion b)
+  Real Quaternion::Angle(Quaternion a, Quaternion b)
   {
-    double dot = Dot(a, b);
+    Real dot = Dot(a, b);
     return acos(fmin(fabs(dot), 1)) * 2;
   }
 
@@ -419,16 +420,16 @@ namespace Gsage {
     return Quaternion(-rotation.X, -rotation.Y, -rotation.Z, rotation.W);
   }
 
-  double Quaternion::Dot(Quaternion lhs, Quaternion rhs)
+  Real Quaternion::Dot(Quaternion lhs, Quaternion rhs)
   {
     return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z + lhs.W * rhs.W;
   }
 
-  Quaternion Quaternion::FromAngleAxis(double angle, Vector3 axis)
+  Quaternion Quaternion::FromAngleAxis(Real angle, Vector3 axis)
   {
     Quaternion q;
-    double m = sqrt(axis.X * axis.X + axis.Y * axis.Y + axis.Z * axis.Z);
-    double s = sin(angle / 2) / m;
+    Real m = sqrt(axis.X * axis.X + axis.Y * axis.Y + axis.Z * axis.Z);
+    Real s = sin(angle / 2) / m;
     q.X = axis.X * s;
     q.Y = axis.Y * s;
     q.Z = axis.Z * s;
@@ -441,14 +442,14 @@ namespace Gsage {
     return FromEuler(rotation.X, rotation.Y, rotation.Z);
   }
 
-  Quaternion Quaternion::FromEuler(double x, double y, double z)
+  Quaternion Quaternion::FromEuler(Real x, Real y, Real z)
   {
-    double cx = cos(x * 0.5);
-    double cy = cos(y * 0.5);
-    double cz = cos(z * 0.5);
-    double sx = sin(x * 0.5);
-    double sy = sin(y * 0.5);
-    double sz = sin(z * 0.5);
+    Real cx = cos(x * 0.5);
+    Real cy = cos(y * 0.5);
+    Real cz = cos(z * 0.5);
+    Real sx = sin(x * 0.5);
+    Real sy = sin(y * 0.5);
+    Real sz = sin(z * 0.5);
     Quaternion q;
     q.X = cx * sy * sz + cy * cz * sx;
     q.Y = cx * cz * sy - cy * sx * sz;
@@ -459,8 +460,8 @@ namespace Gsage {
 
   Quaternion Quaternion::FromToRotation(Vector3 fromVector, Vector3 toVector)
   {
-    double dot = Vector3::Dot(fromVector, toVector);
-    double k = sqrt(Vector3::SqrMagnitude(fromVector) *
+    Real dot = Vector3::Dot(fromVector, toVector);
+    Real k = sqrt(Vector3::SqrMagnitude(fromVector) *
         Vector3::SqrMagnitude(toVector));
     if (fabs(dot / k + 1) < 0.00001)
     {
@@ -473,18 +474,18 @@ namespace Gsage {
 
   Quaternion Quaternion::Inverse(Quaternion rotation)
   {
-    double n = Norm(rotation);
+    Real n = Norm(rotation);
     return Conjugate(rotation) / (n * n);
   }
 
-  Quaternion Quaternion::Lerp(Quaternion a, Quaternion b, double t)
+  Quaternion Quaternion::Lerp(Quaternion a, Quaternion b, Real t)
   {
     if (t < 0) return Normalized(a);
     else if (t > 1) return Normalized(b);
     return LerpUnclamped(a, b, t);
   }
 
-  Quaternion Quaternion::LerpUnclamped(Quaternion a, Quaternion b, double t)
+  Quaternion Quaternion::LerpUnclamped(Quaternion a, Quaternion b, Real t)
   {
     Quaternion quaternion;
     if (Dot(a, b) >= 0)
@@ -505,21 +506,21 @@ namespace Gsage {
     forward = Vector3::Normalized(forward);
     upwards = Vector3::Normalized(upwards);
     // Don't allow zero vectors
-    if (Vector3::SqrMagnitude(forward) < SMALL_DOUBLE || Vector3::SqrMagnitude(upwards) < SMALL_DOUBLE)
+    if (Vector3::SqrMagnitude(forward) < SMALL_REAL || Vector3::SqrMagnitude(upwards) < SMALL_REAL)
       return Quaternion::Identity();
     // Handle alignment with up direction
-    if (1 - fabs(Vector3::Dot(forward, upwards)) < SMALL_DOUBLE)
+    if (1 - fabs(Vector3::Dot(forward, upwards)) < SMALL_REAL)
       return FromToRotation(Vector3::Forward(), forward);
     // Get orthogonal vectors
     Vector3 right = Vector3::Normalized(Vector3::Cross(upwards, forward));
     upwards = Vector3::Cross(forward, right);
     // Calculate rotation
     Quaternion quaternion;
-    double radicand = right.X + upwards.Y + forward.Z;
+    Real radicand = right.X + upwards.Y + forward.Z;
     if (radicand > 0)
     {
       quaternion.W = sqrt(1.0 + radicand) * 0.5;
-      double recip = 1.0 / (4.0 * quaternion.W);
+      Real recip = 1.0 / (4.0 * quaternion.W);
       quaternion.X = (upwards.Z - forward.Y) * recip;
       quaternion.Y = (forward.X - right.Z) * recip;
       quaternion.Z = (right.Y - upwards.X) * recip;
@@ -527,7 +528,7 @@ namespace Gsage {
     else if (right.X >= upwards.Y && right.X >= forward.Z)
     {
       quaternion.X = sqrt(1.0 + right.X - upwards.Y - forward.Z) * 0.5;
-      double recip = 1.0 / (4.0 * quaternion.X);
+      Real recip = 1.0 / (4.0 * quaternion.X);
       quaternion.W = (upwards.Z - forward.Y) * recip;
       quaternion.Z = (forward.X + right.Z) * recip;
       quaternion.Y = (right.Y + upwards.X) * recip;
@@ -535,7 +536,7 @@ namespace Gsage {
     else if (upwards.Y > forward.Z)
     {
       quaternion.Y = sqrt(1.0 - right.X + upwards.Y - forward.Z) * 0.5;
-      double recip = 1.0 / (4.0 * quaternion.Y);
+      Real recip = 1.0 / (4.0 * quaternion.Y);
       quaternion.Z = (upwards.Z + forward.Y) * recip;
       quaternion.W = (forward.X - right.Z) * recip;
       quaternion.X = (right.Y + upwards.X) * recip;
@@ -543,7 +544,7 @@ namespace Gsage {
     else
     {
       quaternion.Z = sqrt(1.0 - right.X - upwards.Y + forward.Z) * 0.5;
-      double recip = 1.0 / (4.0 * quaternion.Z);
+      Real recip = 1.0 / (4.0 * quaternion.Z);
       quaternion.Y = (upwards.Z + forward.Y) * recip;
       quaternion.X = (forward.X + right.Z) * recip;
       quaternion.W = (right.Y - upwards.X) * recip;
@@ -551,7 +552,7 @@ namespace Gsage {
     return quaternion;
   }
 
-  double Quaternion::Norm(Quaternion rotation)
+  Real Quaternion::Norm(Quaternion rotation)
   {
     return sqrt(rotation.X * rotation.X +
         rotation.Y * rotation.Y +
@@ -565,28 +566,28 @@ namespace Gsage {
   }
 
   Quaternion Quaternion::RotateTowards(Quaternion from, Quaternion to,
-      double maxRadiansDelta)
+      Real maxRadiansDelta)
   {
-    double angle = Quaternion::Angle(from, to);
+    Real angle = Quaternion::Angle(from, to);
     if (angle == 0)
       return to;
     maxRadiansDelta = fmax(maxRadiansDelta, angle - M_PI);
-    double t = fmin(1, maxRadiansDelta / angle);
+    Real t = fmin(1, maxRadiansDelta / angle);
     return Quaternion::SlerpUnclamped(from, to, t);
   }
 
-  Quaternion Quaternion::Slerp(Quaternion a, Quaternion b, double t)
+  Quaternion Quaternion::Slerp(Quaternion a, Quaternion b, Real t)
   {
     if (t < 0) return Normalized(a);
     else if (t > 1) return Normalized(b);
     return SlerpUnclamped(a, b, t);
   }
 
-  Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, double t)
+  Quaternion Quaternion::SlerpUnclamped(Quaternion a, Quaternion b, Real t)
   {
-    double n1;
-    double n2;
-    double n3 = Dot(a, b);
+    Real n1;
+    Real n2;
+    Real n3 = Dot(a, b);
     bool flag = false;
     if (n3 < 0)
     {
@@ -600,8 +601,8 @@ namespace Gsage {
     }
     else
     {
-      double n4 = acos(n3);
-      double n5 = 1 / sin(n4);
+      Real n4 = acos(n3);
+      Real n5 = 1 / sin(n4);
       n2 = sin((1 - t) * n4) * n5;
       n1 = flag ? -sin(t * n4) * n5 : sin(t * n4) * n5;
     }
@@ -613,12 +614,12 @@ namespace Gsage {
     return Normalized(quaternion);
   }
 
-  void Quaternion::ToAngleAxis(Quaternion rotation, double &angle, Vector3 &axis)
+  void Quaternion::ToAngleAxis(Quaternion rotation, Real &angle, Vector3 &axis)
   {
     if (rotation.W > 1)
       rotation = Normalized(rotation);
     angle = 2 * acos(rotation.W);
-    double s = sqrt(1 - rotation.W * rotation.W);
+    Real s = sqrt(1 - rotation.W * rotation.W);
     if (s < 0.00001) {
       axis.X = 1;
       axis.Y = 0;
@@ -632,13 +633,13 @@ namespace Gsage {
 
   Vector3 Quaternion::ToEuler(Quaternion rotation)
   {
-    double sqw = rotation.W * rotation.W;
-    double sqx = rotation.X * rotation.X;
-    double sqy = rotation.Y * rotation.Y;
-    double sqz = rotation.Z * rotation.Z;
+    Real sqw = rotation.W * rotation.W;
+    Real sqx = rotation.X * rotation.X;
+    Real sqy = rotation.Y * rotation.Y;
+    Real sqz = rotation.Z * rotation.Z;
     // If normalized is one, otherwise is correction factor
-    double unit = sqx + sqy + sqz + sqw;
-    double test = rotation.X * rotation.W - rotation.Y * rotation.Z;
+    Real unit = sqx + sqy + sqz + sqw;
+    Real test = rotation.X * rotation.W - rotation.Y * rotation.Z;
     Vector3 v;
     // Singularity at north pole
     if (test > 0.4995f * unit)
@@ -672,12 +673,12 @@ namespace Gsage {
 		if (reprojectAxis)
 		{
 			// pick parts of xAxis() implementation that we need
-			double fTy  = 2.0f*Y;
-			double fTz  = 2.0f*Z;
-			double fTwz = fTz*W;
-			double fTxy = fTy*X;
-			double fTyy = fTy*Y;
-			double fTzz = fTz*Z;
+			Real fTy  = 2.0f*Y;
+			Real fTz  = 2.0f*Z;
+			Real fTwz = fTz*W;
+			Real fTxy = fTy*X;
+			Real fTyy = fTy*Y;
+			Real fTzz = fTz*Z;
 			return Radian(atan2(fTxy+fTwz, 1.0f-(fTyy+fTzz)));
 		}
 		else
@@ -691,12 +692,12 @@ namespace Gsage {
 		if (reprojectAxis)
 		{
 			// pick parts of yAxis() implementation that we need
-			double fTx  = 2.0f*X;
-			double fTz  = 2.0f*Z;
-			double fTwx = fTx*W;
-			double fTxx = fTx*X;
-			double fTyz = fTz*Y;
-			double fTzz = fTz*Z;
+			Real fTx  = 2.0f*X;
+			Real fTz  = 2.0f*Z;
+			Real fTwx = fTx*W;
+			Real fTxx = fTx*X;
+			Real fTyz = fTz*Y;
+			Real fTzz = fTz*Z;
 
 			return Radian(atan2(fTyz+fTwx, 1.0f-(fTxx+fTzz)));
 		}
@@ -712,13 +713,13 @@ namespace Gsage {
 		if (reprojectAxis)
 		{
 			// pick parts of zAxis() implementation that we need
-			double fTx  = 2.0f*X;
-			double fTy  = 2.0f*Y;
-			double fTz  = 2.0f*Z;
-			double fTwy = fTy*W;
-			double fTxx = fTx*X;
-			double fTxz = fTz*X;
-			double fTyy = fTy*Y;
+			Real fTx  = 2.0f*X;
+			Real fTy  = 2.0f*Y;
+			Real fTz  = 2.0f*Z;
+			Real fTwy = fTy*W;
+			Real fTxx = fTx*X;
+			Real fTxz = fTz*X;
+			Real fTyy = fTy*Y;
 
 			return Radian(atan2(fTxz+fTwy, 1.0f-(fTxx+fTyy)));
 
@@ -726,7 +727,7 @@ namespace Gsage {
 		else
 		{
 			// internal version
-      double fValue = -2*(X*Z - W*Y);
+      Real fValue = -2*(X*Z - W*Y);
       if ( -1.0 < fValue )
       {
         if ( fValue < 1.0 )
@@ -739,7 +740,7 @@ namespace Gsage {
 		}
 	}
 
-  struct Quaternion& Quaternion::operator+=(const double rhs)
+  struct Quaternion& Quaternion::operator+=(const Real rhs)
   {
     X += rhs;
     Y += rhs;
@@ -748,7 +749,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Quaternion& Quaternion::operator-=(const double rhs)
+  struct Quaternion& Quaternion::operator-=(const Real rhs)
   {
     X -= rhs;
     Y -= rhs;
@@ -757,7 +758,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Quaternion& Quaternion::operator*=(const double rhs)
+  struct Quaternion& Quaternion::operator*=(const Real rhs)
   {
     X *= rhs;
     Y *= rhs;
@@ -766,7 +767,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Quaternion& Quaternion::operator/=(const double rhs)
+  struct Quaternion& Quaternion::operator/=(const Real rhs)
   {
     X /= rhs;
     Y /= rhs;
@@ -805,14 +806,14 @@ namespace Gsage {
   }
 
   Quaternion operator-(Quaternion rhs) { return rhs * -1; }
-  Quaternion operator+(Quaternion lhs, const double rhs) { return lhs += rhs; }
-  Quaternion operator-(Quaternion lhs, const double rhs) { return lhs -= rhs; }
-  Quaternion operator*(Quaternion lhs, const double rhs) { return lhs *= rhs; }
-  Quaternion operator/(Quaternion lhs, const double rhs) { return lhs /= rhs; }
-  Quaternion operator+(const double lhs, Quaternion rhs) { return rhs += lhs; }
-  Quaternion operator-(const double lhs, Quaternion rhs) { return rhs -= lhs; }
-  Quaternion operator*(const double lhs, Quaternion rhs) { return rhs *= lhs; }
-  Quaternion operator/(const double lhs, Quaternion rhs) { return rhs /= lhs; }
+  Quaternion operator+(Quaternion lhs, const Real rhs) { return lhs += rhs; }
+  Quaternion operator-(Quaternion lhs, const Real rhs) { return lhs -= rhs; }
+  Quaternion operator*(Quaternion lhs, const Real rhs) { return lhs *= rhs; }
+  Quaternion operator/(Quaternion lhs, const Real rhs) { return lhs /= rhs; }
+  Quaternion operator+(const Real lhs, Quaternion rhs) { return rhs += lhs; }
+  Quaternion operator-(const Real lhs, Quaternion rhs) { return rhs -= lhs; }
+  Quaternion operator*(const Real lhs, Quaternion rhs) { return rhs *= lhs; }
+  Quaternion operator/(const Real lhs, Quaternion rhs) { return rhs /= lhs; }
   Quaternion operator+(Quaternion lhs, const Quaternion rhs)
   {
     return lhs += rhs;
@@ -829,7 +830,7 @@ namespace Gsage {
   Vector3 operator*(Quaternion lhs, const Vector3 rhs)
   {
     Vector3 u = Vector3(lhs.X, lhs.Y, lhs.Z);
-    double s = lhs.W;
+    Real s = lhs.W;
     return u * (Vector3::Dot(u, rhs) * 2)
       + rhs * (s * s - Vector3::Dot(u, u))
       + Vector3::Cross(u, rhs) * (2.0 * s);

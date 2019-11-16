@@ -25,6 +25,8 @@ THE SOFTWARE.
 */
 
 #include "systems/RenderSystem.h"
+#include "GsageFacade.h"
+#include "UIManager.h"
 #include "Logger.h"
 
 namespace Gsage {
@@ -163,6 +165,46 @@ namespace Gsage {
     mLock.unlock();
   }
 
+  static const size_t gPixelSize[PF_COUNT] = {
+    0, 1, 2, 1, 1, 3, 3, 4, 4, 3, 3, 4, 4, 4, 4, 4, 0, 0,
+    0, 0, 0, 2, 2, 4, 4, 4, 4, 4, 2, 8, 1, 2, 4, 4, 4, 8,
+    6, 0, 0, 0, 0, 0, 0, 4, 1, 2, 3, 4, 2, 4, 6, 8, 4, 8,
+    12, 16, 1, 2, 3, 4, 2, 4, 6, 8, 4, 8, 12, 16, 4, 0, 0, 0,
+    0, 0, 0, 0, 1, 2, 1, 2, 3, 4, 2, 4, 6, 8, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+  };
+
+  size_t RenderSystem::getPixelSize(PixelFormat pf)
+  {
+    GSAGE_ASSERT(pf < PF_COUNT, "can't get pixel size for format");
+    return gPixelSize[pf];
+  }
+
+  UIRenderer::UIRenderer()
+  {
+
+  }
+
+  TexturePtr UIRenderer::createTexture(const char* name, void* data, int width, int height, PixelFormat pixelFormat)
+  {
+    TexturePtr res = mRender->getTexture(name);
+    if(!res) {
+      DataProxy params;
+      params.put("width", width);
+      params.put("height", height);
+      params.put<int>("pixelFormat", pixelFormat);
+      res = mRender->createTexture(name, params);
+      size_t pixelSize = RenderSystem::getPixelSize(pixelFormat);
+      res->update(data, width * height * pixelSize, width, height);
+    }
+
+    return res;
+  }
+
+  RenderViewport* UIRenderer::getViewport(const char* name){
+    return mRender->getViewport(name);
+  }
+
   RenderSystem::RenderSystem()
   {
   }
@@ -170,5 +212,4 @@ namespace Gsage {
   RenderSystem::~RenderSystem()
   {
   }
-
 }

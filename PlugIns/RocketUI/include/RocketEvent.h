@@ -35,6 +35,8 @@ namespace Gsage {
     public:
       static const Event::Type CREATE;
 
+      static const Event::Type DESTROY;
+
       RocketContextEvent(Event::ConstType type, const std::string& name);
       virtual ~RocketContextEvent();
 

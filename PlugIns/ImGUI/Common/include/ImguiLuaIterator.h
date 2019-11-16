@@ -1310,11 +1310,6 @@ IMGUI_FUNCTION(IsItemHovered)
 CALL_FUNCTION(IsItemHovered, bool)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
-//    IMGUI_API bool          IsItemHoveredRect();                                                // was the last item hovered by mouse? even if another item is active or window is blocked by popup while we are hovering this
-IMGUI_FUNCTION(IsItemHoveredRect)
-CALL_FUNCTION(IsItemHoveredRect, bool)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
 //    IMGUI_API bool          IsItemActive();                                                     // was the last item active? (e.g. button being held, text field being edited- items that don't interact will always return false)
 IMGUI_FUNCTION(IsItemActive)
 CALL_FUNCTION(IsItemActive, bool)
@@ -1370,7 +1365,8 @@ CALL_FUNCTION_NO_RET(SetItemAllowOverlap)
 END_IMGUI_FUNC
 //    IMGUI_API bool          IsWindowHovered();                                                  // is current window hovered and hoverable (not blocked by a popup) (differentiate child windows from each others)
 IMGUI_FUNCTION(IsWindowHovered)
-CALL_FUNCTION(IsWindowHovered, bool)
+OPTIONAL_INT_ARG(flags, 0)
+CALL_FUNCTION(IsWindowHovered, bool, flags)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API bool          IsWindowFocused();                                                  // is current window focused
@@ -1404,12 +1400,6 @@ IMGUI_FUNCTION(IsRectVisible_2)
 IM_VEC_2_ARG(rect_min)
 IM_VEC_2_ARG(rect_max)
 CALL_FUNCTION(IsRectVisible, bool, rect_min, rect_max)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
-//    IMGUI_API bool          IsPosHoveringAnyWindow(const ImVec2& pos);                          // is given position hovering any active imgui window
-IMGUI_FUNCTION(IsPosHoveringAnyWindow)
-IM_VEC_2_ARG(pos)
-CALL_FUNCTION(IsPosHoveringAnyWindow, bool, pos)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API float         GetTime();
@@ -1524,16 +1514,6 @@ END_IMGUI_FUNC
 IMGUI_FUNCTION(IsMouseReleased)
 INT_ARG(button)
 CALL_FUNCTION(IsMouseReleased, bool, button)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
-//    IMGUI_API bool          IsMouseHoveringWindow();                                            // is mouse hovering current window ("window" in API names always refer to current window). disregarding of any consideration of being blocked by a popup. (unlike IsWindowHovered() this will return true even if the window is blocked because of a popup)
-IMGUI_FUNCTION(IsMouseHoveringWindow)
-CALL_FUNCTION(IsMouseHoveringWindow, bool)
-PUSH_BOOL(ret)
-END_IMGUI_FUNC
-//    IMGUI_API bool          IsMouseHoveringAnyWindow();                                         // is mouse hovering any visible window
-IMGUI_FUNCTION(IsMouseHoveringAnyWindow)
-CALL_FUNCTION(IsMouseHoveringAnyWindow, bool)
 PUSH_BOOL(ret)
 END_IMGUI_FUNC
 //    IMGUI_API bool          IsMouseHoveringRect(const ImVec2& r_min, const ImVec2& r_max, bool clip = true);  // is mouse hovering given bounding rect (in screen space). clipped by current clipping settings. disregarding of consideration of focus/window ordering/blocked by a popup.

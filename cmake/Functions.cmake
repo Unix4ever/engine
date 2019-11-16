@@ -97,6 +97,7 @@ macro(configure)
   add_definitions(-DSOL_EXCEPTIONS_SAFE_PROPAGATION=1)
   add_definitions(-DSOL_SAFE_REFERENCES=1)
   add_definitions(-DSOL_SAFE_FUNCTIONS=1)
+  add_definitions(-DOGRE_DEBUG_MODE=0)
 endmacro()
 
 macro(gsage_plugin plugin_name)

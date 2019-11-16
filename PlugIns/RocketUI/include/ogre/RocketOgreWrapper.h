@@ -53,9 +53,6 @@ namespace Gsage {
     private:
       bool render(EventDispatcher* sender, const Event& event);
       void configureRenderSystem(RenderEvent& event);
-
-      Rocket::Core::RenderInterface* mRenderInterface;
-      Rocket::Core::SystemInterface* mSystemInterface;
   };
 }
 

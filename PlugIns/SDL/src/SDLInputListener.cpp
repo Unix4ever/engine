@@ -41,10 +41,10 @@ namespace Gsage {
     }
 
     SDL_StartTextInput();
-    SDL_ShowCursor(engine->settings().get("sdl.showCursor", false));
+    SDL_ShowCursor(engine->settings().get("sdl.showCursor", true));
     SDLInputListener* l = new SDLInputListener(windowHandle, engine);
-    mCore->addEventListener(l);
     mListener = InputHandlerPtr(l);
+    mCore->addEventListener(l);
     return mListener;
   }
 

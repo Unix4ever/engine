@@ -43,12 +43,14 @@ namespace Gsage {
   {
     if(!hasListenersForType(eventType)) {
       mMutationMutex.lock();
-      mSignals[eventType] = new EventSignal();
+      mSignals[eventType] = std::make_shared<EventSignal>();
       mMutationMutex.unlock();
     }
 
     mMutationMutex.lock();
-    EventConnection c = mSignals[eventType]->connect(priority, callback);
+    EventSignalPtr signal = mSignals[eventType];
+    int id = signal->connect(priority, callback);
+    EventConnection c(signal, priority, id);
     mMutationMutex.unlock();
     return c;
   }
@@ -67,7 +69,7 @@ namespace Gsage {
       return 0;
     }
 
-    EventSignal* s = nullptr;
+    EventSignalPtr s = nullptr;
     mMutationMutex.lock();
     s = mSignals[event.getType()];
     mMutationMutex.unlock();
@@ -77,12 +79,11 @@ namespace Gsage {
   void EventDispatcher::removeAllListeners()
   {
     mMutationMutex.lock();
-    for(std::pair<Event::ConstType, EventSignal*> element : mSignals)
+    for(std::pair<Event::ConstType, EventSignalPtr> element : mSignals)
     {
       if (element.first == DispatcherEvent::FORCE_UNSUBSCRIBE)
       {
         (*element.second)(this, DispatcherEvent(DispatcherEvent::FORCE_UNSUBSCRIBE));
-        delete element.second;
       }
     }
     mSignals.clear();
@@ -98,7 +99,7 @@ namespace Gsage {
   {
   }
 
-  EventConnection EventSignal::connect(const int priority, EventCallback callback)
+  int EventSignal::connect(const int priority, EventCallback callback)
   {
     if(!contains(mConnections, priority))
     {
@@ -107,7 +108,7 @@ namespace Gsage {
 
     int id = mConnections[priority].empty() ? 0 : (--mConnections[priority].end())->first + 1;
     mConnections[priority].insert(std::make_pair(id, callback));
-    return EventConnection(this, priority, id);
+    return id;
   }
 
   int EventSignal::operator()(EventDispatcher* dispatcher, const Event& event)
@@ -136,7 +137,7 @@ namespace Gsage {
     mConnections[priority].erase(id);
   }
 
-  EventConnection::EventConnection(EventSignal* signal, int priority, int id)
+  EventConnection::EventConnection(EventSignalPtr signal, int priority, int id)
     : mSignal(signal)
     , mPriority(priority)
     , mId(id)

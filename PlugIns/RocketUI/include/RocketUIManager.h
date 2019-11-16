@@ -43,12 +43,14 @@ namespace Gsage {
   class RenderEvent;
   class Engine;
   class GsageFacade;
+  class RenderInterfaceGsage;
+  class SystemInterfaceGsage;
 
   class RenderSystemWrapper {
     public:
       typedef std::map<std::string, Rocket::Core::Context*> Contexts;
 
-      RenderSystemWrapper(Engine* engine) : mInitialized(false), mEngine(engine) {}
+      RenderSystemWrapper(Engine* engine);
 
       virtual ~RenderSystemWrapper();
 
@@ -75,6 +77,8 @@ namespace Gsage {
        * Destroy render system wrapper
        */
       virtual void destroy();
+
+      void newFrame(const std::string& contextName, int width, int height, UIDrawList* drawList);
     protected:
       /**
        * Create context
@@ -84,12 +88,15 @@ namespace Gsage {
       /**
        * Set up interfaces
        */
-      virtual void setUpInterfaces(unsigned int width, unsigned int height) = 0;
+      virtual void setUpInterfaces(unsigned int width, unsigned int height);
 
       Contexts mContexts;
       Engine* mEngine;
       lua_State* mLuaState;
       bool mInitialized;
+
+      RenderInterfaceGsage* mRenderInterface;
+      SystemInterfaceGsage* mSystemInterface;
   };
 
   class RocketUIManager : public UIManager, public EventSubscriber<RocketUIManager>
@@ -127,6 +134,8 @@ namespace Gsage {
       bool handleSystemChange(EventDispatcher* sender, const Event& event);
 
       const std::string& getType();
+
+      void newFrame(const std::string& contextName, int width, int height);
     private:
       /**
        * Handle mouse event from engine

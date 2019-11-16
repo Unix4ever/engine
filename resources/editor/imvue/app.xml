@@ -1,0 +1,15 @@
+<template>
+  <scene/>
+</template>
+
+<script>
+  -- add imvue components search path
+  package.imvpath = package.imvpath .. ';' .. getResourcePath('editor/imvue/?.imv')
+
+  return ImVue.new({
+    components = {
+      scene = require 'components.scene'
+    }
+  })
+</script>
+

@@ -74,6 +74,7 @@ namespace Gsage {
     lua.new_usertype<ImguiManager>("ImguiManager",
         "new", sol::no_constructor,
         "addView", &ImguiManager::addView,
+        "addDocument", &ImguiManager::addDocument,
         "removeView", &ImguiManager::removeView
     );
 

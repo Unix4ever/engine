@@ -458,15 +458,19 @@ namespace Gsage {
     auto now = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> frameTime(now - mPreviousUpdateTime);
 
+    float delta = frameTime.count();
     for(auto& listener : mUpdateListeners)
     {
-      listener->update(frameTime.count());
+      listener->update(delta);
     }
 
     // update engine
-    mEngine.update(frameTime.count());
-    mInputManager.update(frameTime.count());
-    mFilesystem.update(frameTime.count());
+    for(auto& pair : mUIManagers) {
+      pair.second->newFrame(delta);
+    }
+    mInputManager.update(delta);
+    mEngine.update(delta);
+    mFilesystem.update(delta);
     mPreviousUpdateTime = now;
     std::chrono::duration<double> maxTime(1.0/60.0);
     if(maxTime > frameTime) {
@@ -530,9 +534,9 @@ namespace Gsage {
     return mGameDataManager->dumpSave(name);
   }
 
-  int GsageFacade::addUIManager(UIManager* value)
+  size_t GsageFacade::addUIManager(UIManager* value)
   {
-    int handle = mUIManagers.size();
+    size_t handle = mUIManagers.size();
     mUIManagers[handle] = value;
     if(mLuaInterface != 0 && mLuaInterface->getState()) {
       mUIManagers[handle]->initialize(this, mLuaInterface->getState());
@@ -549,7 +553,7 @@ namespace Gsage {
     return nullptr;
   }
 
-  bool GsageFacade::removeUIManager(int handle)
+  bool GsageFacade::removeUIManager(size_t handle)
   {
     if(mUIManagers.count(handle) == 0) {
       return false;

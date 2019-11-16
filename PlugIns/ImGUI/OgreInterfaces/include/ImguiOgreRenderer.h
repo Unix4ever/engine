@@ -65,6 +65,7 @@ namespace Gsage {
       int mFontTexWidth;
       int mFontTexHeight;
       bool mUpdateFontTex;
+      ImGuiMouseCursor mCurrentCursor;
 
       std::mutex mFontTexLock;
   };

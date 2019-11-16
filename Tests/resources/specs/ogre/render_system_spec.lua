@@ -34,7 +34,7 @@ describe("#ogre render system", function()
         textureType = ogre.TEX_TYPE_2D,
         depth = 1,
         numMipmaps = 0,
-        pixelFormat = ogre.PF_R8G8B8A8,
+        pixelFormat = PixelFormat.PF_R8G8B8A8,
         usage = TU_RENDERTARGET,
         hwGammaCorrection = true,
         fsaa = 0

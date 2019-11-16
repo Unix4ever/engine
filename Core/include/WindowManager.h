@@ -51,7 +51,19 @@ namespace Gsage {
         FAILURE
       };
 
-      Window(const std::string& name) : mName(name) {};
+      enum Cursor {
+        None = -1,
+        Arrow = 0,
+        TextInput,
+        ResizeAll,
+        ResizeNS,
+        ResizeEW,
+        ResizeNESW,
+        ResizeNWSE,
+        Hand
+      };
+
+      Window(const std::string& name) : mName(name), mCurrentCursor(Cursor::Arrow) {};
       /**
        * Get window handle
        */
@@ -112,8 +124,16 @@ namespace Gsage {
        * Hide window
        */
       virtual void hide() = 0;
+
+      /**
+       * Change cursor
+       *
+       * @param c cursor type
+       */
+      virtual void setCursor(Cursor c) = 0;
     protected:
       std::string mName;
+      Cursor mCurrentCursor;
   };
 
   /**

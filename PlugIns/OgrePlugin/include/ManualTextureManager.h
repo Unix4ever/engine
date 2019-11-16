@@ -94,7 +94,7 @@ namespace Gsage {
           float mScalingFactor;
       };
 
-      OgreTexture(const std::string& name, const DataProxy& params, Ogre::PixelFormat pixelFormat, int flags = 0);
+      OgreTexture(const std::string& name, const DataProxy& params, PixelFormat pixelFormat, int flags = 0);
       virtual ~OgreTexture();
 
       /**
@@ -247,7 +247,7 @@ namespace Gsage {
        *
        * @param format Ogre::PixelFormat
        */
-      inline void setDefaultPixelFormat(Ogre::PixelFormat format) { mPixelFormat = format; }
+      inline void setDefaultPixelFormat(PixelFormat format) { mPixelFormat = format; }
 
       /**
        * Update dirty textures
@@ -256,7 +256,7 @@ namespace Gsage {
     private:
 
       std::map<RenderSystem::TextureHandle, TexturePtr> mTextures;
-      Ogre::PixelFormat mPixelFormat;
+      PixelFormat mPixelFormat;
       OgreRenderSystem* mRenderSystem;
 
       typedef std::unordered_map<Ogre::String, int> RenderSystemCapabilities;

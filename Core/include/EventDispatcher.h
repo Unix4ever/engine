@@ -47,6 +47,8 @@ namespace Gsage {
    */
   typedef std::function<bool (EventDispatcher*, const Event&)> EventCallback;
 
+  typedef std::shared_ptr<EventSignal> EventSignalPtr;
+
   /**
    * Identifies single connection to the EventSignal
    * - signal pointer
@@ -56,14 +58,14 @@ namespace Gsage {
   class EventConnection
   {
     public:
-      EventConnection(EventSignal* signal, int priority, int id);
+      EventConnection(EventSignalPtr signal, int priority, int id);
       virtual ~EventConnection();
       /**
        * Disconnect underlying connection
        */
       void disconnect();
     private:
-      EventSignal* mSignal;
+      EventSignalPtr mSignal;
       int mPriority;
       int mId;
   };
@@ -81,7 +83,7 @@ namespace Gsage {
        * @param priority 0 means the biggest priority
        * @param callback function to call
        */
-      EventConnection connect(const int priority, EventCallback callback);
+      int connect(const int priority, EventCallback callback);
 
       /**
        * Call signall
@@ -160,7 +162,7 @@ namespace Gsage {
       /**
        * All event bindings
        */
-      typedef std::map<Event::ConstType, EventSignal*, CmpEventType> EventTypes;
+      typedef std::map<Event::ConstType, EventSignalPtr, CmpEventType> EventTypes;
 
       /**
        * Dispatch event to all subscribers of the type, defined in the event.

@@ -46,6 +46,49 @@ THE SOFTWARE.
 #include "systems/OgreRenderSystem.h"
 
 namespace Gsage {
+
+  static const Ogre::PixelFormat g_FormatMapping[Gsage::PF_COUNT] = {
+    Ogre::PF_UNKNOWN,
+    Ogre::PF_L8, Ogre::PF_L16,
+    Ogre::PF_A8, Ogre::PF_BYTE_LA,
+    Ogre::PF_R5G6B5, Ogre::PF_B5G6R5, Ogre::PF_A4R4G4B4, Ogre::PF_A1R5G5B5,
+    Ogre::PF_R8G8B8, Ogre::PF_B8G8R8, Ogre::PF_A8R8G8B8, Ogre::PF_A8B8G8R8,
+    Ogre::PF_B8G8R8A8, Ogre::PF_A2R10G10B10, Ogre::PF_A2B10G10R10, Ogre::PF_DXT1,
+    Ogre::PF_DXT2, Ogre::PF_DXT3, Ogre::PF_DXT4, Ogre::PF_DXT5,
+    Ogre::PF_FLOAT16_RGB, Ogre::PF_FLOAT16_RGBA, Ogre::PF_FLOAT32_RGB, Ogre::PF_FLOAT32_RGBA,
+    Ogre::PF_X8R8G8B8, Ogre::PF_X8B8G8R8, Ogre::PF_R8G8B8A8,
+#if OGRE_VERSION < 0x020100
+    Ogre::PF_DEPTH16,
+#else
+    Ogre::PF_DEPTH_DEPRECATED,
+#endif
+    Ogre::PF_SHORT_RGBA, Ogre::PF_R3G3B2, Ogre::PF_FLOAT16_R,
+    Ogre::PF_FLOAT32_R, Ogre::PF_SHORT_GR, Ogre::PF_FLOAT16_GR, Ogre::PF_FLOAT32_GR,
+    Ogre::PF_SHORT_RGB, Ogre::PF_PVRTC_RGB2, Ogre::PF_PVRTC_RGBA2, Ogre::PF_PVRTC_RGB4,
+    Ogre::PF_PVRTC_RGBA4, Ogre::PF_PVRTC2_2BPP, Ogre::PF_PVRTC2_4BPP, Ogre::PF_R11G11B10_FLOAT,
+    Ogre::PF_R8_UINT, Ogre::PF_R8G8_UINT, Ogre::PF_R8G8B8_UINT, Ogre::PF_R8G8B8A8_UINT,
+    Ogre::PF_R16_UINT, Ogre::PF_R16G16_UINT, Ogre::PF_R16G16B16_UINT, Ogre::PF_R16G16B16A16_UINT,
+    Ogre::PF_R32_UINT, Ogre::PF_R32G32_UINT, Ogre::PF_R32G32B32_UINT, Ogre::PF_R32G32B32A32_UINT,
+    Ogre::PF_R8_SINT, Ogre::PF_R8G8_SINT, Ogre::PF_R8G8B8_SINT, Ogre::PF_R8G8B8A8_SINT,
+    Ogre::PF_R16_SINT, Ogre::PF_R16G16_SINT, Ogre::PF_R16G16B16_SINT, Ogre::PF_R16G16B16A16_SINT,
+    Ogre::PF_R32_SINT, Ogre::PF_R32G32_SINT, Ogre::PF_R32G32B32_SINT, Ogre::PF_R32G32B32A32_SINT,
+    Ogre::PF_R9G9B9E5_SHAREDEXP, Ogre::PF_BC4_UNORM, Ogre::PF_BC4_SNORM, Ogre::PF_BC5_UNORM,
+    Ogre::PF_BC5_SNORM, Ogre::PF_BC6H_UF16, Ogre::PF_BC6H_SF16, Ogre::PF_BC7_UNORM,
+    Ogre::PF_R8, Ogre::PF_RG8, Ogre::PF_R8_SNORM, Ogre::PF_R8G8_SNORM,
+    Ogre::PF_R8G8B8_SNORM, Ogre::PF_R8G8B8A8_SNORM, Ogre::PF_R16_SNORM, Ogre::PF_R16G16_SNORM,
+    Ogre::PF_R16G16B16_SNORM, Ogre::PF_R16G16B16A16_SNORM, Ogre::PF_ETC1_RGB8, Ogre::PF_ETC2_RGB8,
+    Ogre::PF_ETC2_RGBA8, Ogre::PF_ETC2_RGB8A1, Ogre::PF_ATC_RGB, Ogre::PF_ATC_RGBA_EXPLICIT_ALPHA,
+    Ogre::PF_ATC_RGBA_INTERPOLATED_ALPHA, Ogre::PF_ASTC_RGBA_4X4_LDR, Ogre::PF_ASTC_RGBA_5X4_LDR, Ogre::PF_ASTC_RGBA_5X5_LDR,
+    Ogre::PF_ASTC_RGBA_6X5_LDR, Ogre::PF_ASTC_RGBA_6X6_LDR, Ogre::PF_ASTC_RGBA_8X5_LDR, Ogre::PF_ASTC_RGBA_8X6_LDR,
+    Ogre::PF_ASTC_RGBA_8X8_LDR, Ogre::PF_ASTC_RGBA_10X5_LDR, Ogre::PF_ASTC_RGBA_10X6_LDR, Ogre::PF_ASTC_RGBA_10X8_LDR,
+    Ogre::PF_ASTC_RGBA_10X10_LDR, Ogre::PF_ASTC_RGBA_12X10_LDR, Ogre::PF_ASTC_RGBA_12X12_LDR,
+#if OGRE_VERSION < 0x020100
+    Ogre::PF_DEPTH32
+#else
+    Ogre::PF_UNKNOWN
+#endif
+  };
+
   OgreTexture::ScalingPolicy::ScalingPolicy(OgreTexture& texture)
     : mTexture(texture)
     , mWidth(0)
@@ -95,7 +138,6 @@ namespace Gsage {
 
   bool OgreTexture::DefaultScalingPolicy::resize()
   {
-
     mTexture.create(mWidth, mHeight);
     return true;
   }
@@ -128,7 +170,7 @@ namespace Gsage {
     return created;
   }
 
-  OgreTexture::OgreTexture(const std::string& name, const DataProxy& params, Ogre::PixelFormat pixelFormat, int flags)
+  OgreTexture::OgreTexture(const std::string& name, const DataProxy& params, PixelFormat pixelFormat, int flags)
     : Texture(name, params)
     , mHasData(false)
     , mDirty(false)
@@ -137,7 +179,7 @@ namespace Gsage {
     , mFlags(flags)
   {
     if(mParams.count("pixelFormat") == 0) {
-      mParams.put("pixelFormat", pixelFormat);
+      mParams.put("pixelFormat", (int)pixelFormat);
     }
     create();
   }
@@ -154,7 +196,16 @@ namespace Gsage {
 
     unsigned int depth = mParams.get("depth", 1);
     int numMipmaps = mParams.get("numMipmaps", 0);
-    Ogre::PixelFormat pixelFormat = (Ogre::PixelFormat)mParams.get("pixelFormat", (int)Ogre::PF_R8G8B8A8);
+    auto p = mParams.get<int>("pixelFormat");
+    int index = mParams.get<int>("pixelFormat", Gsage::PF_R8G8B8A8);
+    Ogre::PixelFormat pixelFormat = Ogre::PF_UNKNOWN;
+    if(index < Gsage::PF_COUNT)
+      pixelFormat = g_FormatMapping[index];
+
+    if(pixelFormat == Ogre::PF_UNKNOWN) {
+      LOG(ERROR) << "Tried to create texture of unknown format";
+      return;
+    }
     Ogre::TextureUsage usage = (Ogre::TextureUsage)mParams.get("usage", (unsigned int)Ogre::TU_DEFAULT);
     bool hwGammaCorrection = mParams.get("hwGammaCorrection", true);
     unsigned int fsaa = mParams.get("fsaa", 0);
@@ -169,6 +220,7 @@ namespace Gsage {
       if(!mTexture.isNull()) {
         mTexture->removeListener(this);
       }
+      mTexture.reset();
       texManager->remove(resource);
     }
 
@@ -207,7 +259,7 @@ namespace Gsage {
 
 #if OGRE_VERSION >= 0x020100
     // additionally set up Hlms for 2.1
-    Ogre::HlmsManager *hlmsManager = Ogre::Root::getSingletonPtr()->getHlmsManager();
+    /*Ogre::HlmsManager *hlmsManager = Ogre::Root::getSingletonPtr()->getHlmsManager();
     Ogre::HlmsUnlit *hlmsUnlit = static_cast<Ogre::HlmsUnlit*>(hlmsManager->getHlms(Ogre::HLMS_UNLIT));
     Ogre::HlmsUnlitDatablock *datablock = static_cast<Ogre::HlmsUnlitDatablock*>(hlmsUnlit->getDatablock(mHandle));
     if(!datablock) {
@@ -219,10 +271,10 @@ namespace Gsage {
             Ogre::HlmsParamVec()));
     }
 
-    datablock->setTexture(Ogre::PBSM_DIFFUSE, 0, mTexture);
+    datablock->setTexture(Ogre::PBSM_DIFFUSE, 0, mTexture);*/
 #endif
     mTexture->addListener(this);
-    LOG(TRACE) << "Created texture " << mHandle << " with size " << width << "x" << height;
+    LOG(TRACE) << "Created texture " << mHandle << " with size " << width << "x" << height << " " << mParams;
     mValid = true;
     if(usage & Ogre::TU_RENDERTARGET) {
       mHasData = true;
@@ -235,6 +287,7 @@ namespace Gsage {
       buffer, size, width, height,
       Rect<int>(0, 0, width, height)
     );
+    render();
   }
 
   void OgreTexture::update(const void* buffer, size_t size, int width, int height, const Rect<int>& area)
@@ -416,7 +469,7 @@ namespace Gsage {
       if(texManager) {
         texManager->remove(mHandle);
       }
-      mTexture.setNull();
+      mTexture.reset();
     }
     mScalingPolicy->invalidate();
     mValid = false;
@@ -425,7 +478,7 @@ namespace Gsage {
   }
 
   ManualTextureManager::ManualTextureManager(OgreRenderSystem* renderSystem)
-    : mPixelFormat(Ogre::PF_R8G8B8A8)
+    : mPixelFormat(PF_R8G8B8A8)
     , mRenderSystem(renderSystem)
   {
     mRenderSystemCapabilities["OpenGL 3+ Rendering Subsystem"] = OgreTexture::BlitDirty;
@@ -522,7 +575,6 @@ namespace Gsage {
 
     texture->setSize(width, height);
     mTextures[handle] = tex;
-
     return mTextures[handle];
   }
 

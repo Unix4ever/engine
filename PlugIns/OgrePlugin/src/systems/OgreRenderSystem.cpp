@@ -86,6 +86,7 @@ THE SOFTWARE.
 #include <chrono>
 
 #include "OgreGeom.h"
+#include "OgreUIRenderer.h"
 #include "GsageDefinitions.h"
 
 
@@ -282,7 +283,7 @@ namespace Gsage {
       mRoot->setRenderSystem(renderSystem);
 #if GSAGE_PLATFORM==GSAGE_APPLE && defined(WITH_METAL) && OGRE_VERSION >= 0x020100
       if(renderSystem->getFriendlyName() == "Metal_RS") {
-        mManualTextureManager.setDefaultPixelFormat(Ogre::PF_X8R8G8B8);
+        mManualTextureManager.setDefaultPixelFormat(PF_X8R8G8B8);
       }
 #endif
     } else {
@@ -294,6 +295,7 @@ namespace Gsage {
     mRoot->initialise(false);
 
     mWindow = createRenderTarget(windowName, RenderTargetType::Window, windowParams);
+    mWindow->setWindow(window);
 
     EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::RESIZE, &OgreRenderSystem::handleWindowResized, 0);
 
@@ -415,6 +417,7 @@ namespace Gsage {
     // initialize render targets defined in configs
     for(auto pair : mRenderTargets) {
       pair.second->initialize(mSceneManager);
+      pair.second->setWindow(window);
       mRenderTargetsReverseIndex[pair.second->getOgreRenderTarget()] = pair.first;
     }
 
@@ -501,17 +504,14 @@ namespace Gsage {
 
   void OgreRenderSystem::update(const double& time)
   {
-    for(int i = 0; i < mMutationQueue.size(); ++i) {
-      ObjectMutation om;
-      mMutationQueue.get(om);
-      om.execute();
-    }
-
     ComponentStorage<OgreRenderComponent>::update(time);
     Ogre::WindowEventUtilities::messagePump();
 
     mEngine->fireEvent(RenderEvent(RenderEvent::UPDATE, this));
 
+#if OGRE_VERSION >= 0x020100
+    mSceneManager->updateSceneGraph();
+#endif
     for(auto pair : mRenderTargets) {
       if(!pair.second->isAutoUpdated()) {
         pair.second->update();
@@ -679,11 +679,6 @@ namespace Gsage {
     return true;
   }
 
-  void OgreRenderSystem::queueMutation(ObjectMutation::Callback callback)
-  {
-    mMutationQueue << ObjectMutation(callback);
-  }
-
   GeomPtr OgreRenderSystem::getGeometry(const BoundingBox& bounds, int flags)
   {
     OgreEntities entities = getEntities(flags, bounds);
@@ -772,6 +767,11 @@ namespace Gsage {
     return mManualTextureManager.deleteTexture(handle);
   }
 
+  UIRendererPtr OgreRenderSystem::createUIRenderer() const
+  {
+    return UIRendererPtr(new OgreUIRenderer());
+  }
+
   void OgreRenderSystem::renderQueueStarted(Ogre::uint8 queueGroupId, const Ogre::String& invocation, bool& skipThisInvocation)
   {
     if(!skipThisInvocation) {
@@ -794,6 +794,8 @@ namespace Gsage {
       } else {
         target = mWindow;
       }
+
+      target->renderOverlay();
       mEngine->fireEvent(RenderEvent(RenderEvent::RENDER_QUEUE_ENDED, this, queueGroupId, target));
     }
   }

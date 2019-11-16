@@ -1,0 +1,82 @@
+<template>
+  <viewport :bg-colour="self['bg-colour']" :texture-id="self['texture-id']"/>
+</template>
+
+<script>
+return {
+  props = {
+    ['bg-colour'] = {
+      type = ImVue_Number,
+      default = 0x000000FF
+    },
+    ['texture-id'] = {
+      type = ImVue_String,
+      default = "sceneEditor"
+    },
+    ['camera-name'] = {
+      type = ImVue_String,
+      default = "scenecam"
+    },
+    ['camera-type'] = {
+      type = ImVue_String,
+      default = "free"
+    }
+  },
+  mounted = function(self)
+    self.camera = camera:create(self['camera-type'], self['camera-name'], {})
+    local texture = self.camera:renderToTexture(self['texture-id'], {
+      autoUpdated = false,
+      -- V2 workspace
+      workspaceName = "ogreview",
+      -- V1 viewport settings
+      viewport = {
+        compositors = {
+          "Utility/Highlight"
+        },
+        backgroundColor = "0x00000000",
+        renderQueueSequence = {
+          ogre.RENDER_QUEUE_BACKGROUND,
+          ogre.RENDER_QUEUE_SKIES_EARLY,
+          ogre.RENDER_QUEUE_MAIN,
+          ogre.RENDER_QUEUE_OVERLAY,
+        }
+      }
+    })
+    local grid = eal:getEntity("__grid__")
+    if not grid then
+      local e = data:createEntity({
+        id = "grid",
+        vars = {
+          utility = true
+        },
+        render = {
+          root = {
+            children = {
+              {
+                type = "billboard",
+                name = "__grid__",
+                commonUpVector = Vector3.new(0, 0, 1),
+                commonDirection = Vector3.new(0, 1, 0),
+                billboardType = "BBT_PERPENDICULAR_COMMON",
+                materialName = "Utility.Grid",
+                billboards = {
+                  {
+                    position = Vector3.new(0, -1, 0),
+                    width = 20,
+                    height = 20
+                  }
+                }
+              }
+            }
+          }
+        }
+      })
+    end
+  end,
+  data = function(self)
+    return {
+      
+    }
+  end
+}
+</script>

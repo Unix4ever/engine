@@ -787,6 +787,9 @@ namespace Gsage {
         "handle", &WindowEvent::handle
     );
 
+    lua.create_table("PixelFormat");
+    lua["PixelFormat"]["PF_R8G8B8A8"] = Gsage::PF_R8G8B8A8;
+
     lua.create_table("Keys");
 
     lua["Keys"]["Ctrl"] = KeyboardEvent::Ctrl;

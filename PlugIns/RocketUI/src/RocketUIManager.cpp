@@ -34,6 +34,9 @@ THE SOFTWARE.
 #include "ogre/RocketOgreWrapper.h"
 #endif
 
+#include "RenderInterfaceGsage.h"
+#include "SystemInterfaceGsage.h"
+
 #include "MouseEvent.h"
 #include "Engine.h"
 #include "GsageFacade.h"
@@ -42,16 +45,37 @@ THE SOFTWARE.
 
 namespace Gsage {
 
+  RenderSystemWrapper::RenderSystemWrapper(Engine* engine)
+    : mInitialized(false)
+    , mEngine(engine)
+    , mRenderInterface(0)
+    , mSystemInterface(0)
+  {
+  }
+
   RenderSystemWrapper::~RenderSystemWrapper()
   {
   }
 
   void RenderSystemWrapper::destroy()
   {
+    bool destroyed = true;
     for(auto pair : mContexts) {
+      pair.second->UnloadAllDocuments();
+      pair.second->UnloadAllMouseCursors();
       pair.second->RemoveReference();
+      mEngine->fireEvent(RocketContextEvent(RocketContextEvent::DESTROY, pair.first));
+
+      if(pair.second->GetReferenceCount() == 0) {
+        destroyed = false;
+        LOG(ERROR) << "Context " << pair.first << " is still referenced, this will lead to memory leaks";
+      }
     }
-    Rocket::Core::Shutdown();
+    mContexts.clear();
+
+    if(destroyed) {
+      Rocket::Core::Shutdown();
+    }
   }
 
   Rocket::Core::Context* RenderSystemWrapper::getContext(const std::string& name)
@@ -92,6 +116,42 @@ namespace Gsage {
     mEngine->fireEvent(RocketContextEvent(RocketContextEvent::CREATE, name));
     LOG(INFO) << "Created context " << name << ", initial size: " << width << "x" << height;
     return mContexts[name];
+  }
+
+  void RenderSystemWrapper::setUpInterfaces(unsigned int width, unsigned int height)
+  {
+    EngineSystem* render = mEngine->getSystem("render");
+    if(!render) {
+      LOG(ERROR) << "Failed to set up render interface: no render system installed";
+      return;
+    }
+
+    mRenderInterface = new RenderInterfaceGsage(dynamic_cast<RenderSystem*>(render));
+    mSystemInterface = new SystemInterfaceGsage();
+
+    Rocket::Core::SetRenderInterface(mRenderInterface);
+    Rocket::Core::SetSystemInterface(mSystemInterface);
+  }
+
+  void RenderSystemWrapper::newFrame(const std::string& name, int width, int height, UIDrawList* drawList)
+  {
+    Rocket::Core::Context* ctx;
+
+    // init context for the render target
+    if(mContexts.count(name) == 0) {
+      ctx = createContext(name, width, height);
+    } else {
+      ctx = getContext(name);
+    }
+
+    mRenderInterface->setDrawList(drawList);
+
+    ctx->SetDimensions(Rocket::Core::Vector2i(width, height));
+
+    ctx->Update();
+
+    // should populate drawlist
+    ctx->Render();
   }
 
   const std::string RocketUIManager::TYPE = "rocket";
@@ -154,21 +214,10 @@ namespace Gsage {
     }
 
     const std::string type = render->getSystemInfo().get("type", "unknown");
-    bool initialized = false;
-#ifdef OGRE_INTERFACE
-    if(type == "ogre") {
-      LOG(INFO) << "Initialize for render system ogre3d";
-      mRenderSystemWrapper = new RocketOgreWrapper(engine);
-      initialized = true;
-    }
-
+    LOG(INFO) << "Initialize renderer";
+    mRenderSystemWrapper = new RenderSystemWrapper(engine);
     setLuaState(mLuaState);
-#endif
 
-    if(!initialized) {
-      LOG(ERROR) << "Failed to initialize rocket ui manager with the render system of type \"" << type << "\"";
-      return;
-    }
     // mouse events
     addEventListener(engine, MouseEvent::MOUSE_DOWN, &RocketUIManager::handleMouseEvent, -100);
     addEventListener(engine, MouseEvent::MOUSE_UP, &RocketUIManager::handleMouseEvent, -100);
@@ -256,6 +305,12 @@ namespace Gsage {
     }
 
     return true;
+  }
+
+  void RocketUIManager::newFrame(const std::string& name, int width, int height)
+  {
+    UIDrawList& drawList = getDrawList(name);
+    mRenderSystemWrapper->newFrame(name, width, height, &drawList);
   }
 
   bool RocketUIManager::handleInputEvent(EventDispatcher* sender, const Event& event)

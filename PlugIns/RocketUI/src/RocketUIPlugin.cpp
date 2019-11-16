@@ -63,6 +63,7 @@ namespace Gsage {
       "onRocketContext",
       sol::base_classes, sol::bases<Event>(),
       "CREATE", sol::var(RocketContextEvent::CREATE),
+      "DESTROY", sol::var(RocketContextEvent::DESTROY),
       "name", sol::readonly(&RocketContextEvent::name)
     );
   }

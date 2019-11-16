@@ -28,6 +28,7 @@ THE SOFTWARE.
 
 #include "sol.hpp"
 #include <imgui.h>
+#include <lua/script.h>
 
 #include "MouseEvent.h"
 #include "Engine.h"
@@ -274,42 +275,44 @@ namespace Gsage {
   {
     UIManager::initialize(facade, luaState);
     Engine* engine = facade->getEngine();
-    setUp();
-    addEventListener(engine, SystemChangeEvent::SYSTEM_STOPPING, &ImguiManager::handleSystemChange);
-    addEventListener(engine, SystemChangeEvent::SYSTEM_STARTED, &ImguiManager::handleSystemChange);
-    // mouse events
-    addEventListener(engine, MouseEvent::MOUSE_DOWN, &ImguiManager::handleMouseEvent, -100);
-    addEventListener(engine, MouseEvent::MOUSE_UP, &ImguiManager::handleMouseEvent, -100);
-    addEventListener(engine, MouseEvent::MOUSE_MOVE, &ImguiManager::handleMouseEvent, -100);
-    // keyboard events
-    addEventListener(engine, KeyboardEvent::KEY_DOWN, &ImguiManager::handleKeyboardEvent, -100);
-    addEventListener(engine, KeyboardEvent::KEY_UP, &ImguiManager::handleKeyboardEvent, -100);
-    // input event
-    addEventListener(engine, TextInputEvent::INPUT, &ImguiManager::handleInputEvent, -100);
+    createRenderer(NULL);
   }
 
-  bool ImguiManager::handleSystemChange(EventDispatcher* sender, const Event& event)
+  bool ImguiManager::addDocument(const std::string& name, const std::string& file)
   {
-    const SystemChangeEvent& e = static_cast<const SystemChangeEvent&>(event);
-
-    if(e.mSystemId != "render") {
-      return true;
+    ImVue::Context* ctx = ImVue::createContext(
+        ImVue::createElementFactory(),
+        new ImVue::LuaScriptState(mLuaState)
+        // TODO: custom filesystem and texture manager
+    );
+    ImVue::Document* doc = new ImVue::Document(ctx);
+    std::string path = FileLoader::getSingletonPtr()->searchFile(file);
+    if(path.empty()) {
+      LOG(ERROR) << "Document file not found " << file;
+      return false;
+    }
+    char* data = ctx->fs->load(&path[0]);
+    if(!data) {
+      return false;
     }
 
-    if(e.getType() == SystemChangeEvent::SYSTEM_STARTED)
-    {
-      setUp();
+    bool success = false;
+    try {
+      doc->parse(data);
+      success = true;
+    } catch (const ImVue::ElementError& err) {
+      LOG(ERROR) << "Failed to parse document " << file << " " << err.what();
+    } catch (const ImVue::ScriptError& err) {
+      LOG(ERROR) << "Failed to parse document " << file << " " << err.what();
+    } catch (...) {
+      LOG(ERROR) << "Failed to parse document " << file;
     }
-
-    if(e.getType() == SystemChangeEvent::SYSTEM_STOPPING && mRenderer != 0)
-    {
-      tearDown();
-      LOG(INFO) << "Render system was removed, system wrapper was destroyed";
-    }
-    return true;
+    ImGui::MemFree(data);
+    mDocuments[name] = doc;
+    return success;
   }
 
-  void ImguiManager::setUp()
+  void ImguiManager::createRenderer(RenderSystem* rs)
   {
     if(mIsSetUp)
       return;
@@ -345,14 +348,10 @@ namespace Gsage {
     setLuaState(mLuaState);
 
     mIsSetUp = true;
-
-    // subscribe for engine updates to handle UI
-    addEventListener(mFacade->getEngine(), EngineEvent::UPDATE, &ImguiManager::render);
   }
 
-  void ImguiManager::tearDown()
+  void ImguiManager::shutdown()
   {
-    removeEventListener(mFacade->getEngine(), EngineEvent::UPDATE, &ImguiManager::render);
     mIsSetUp = false;
     delete mRenderer;
     mRenderer = 0;
@@ -424,20 +423,22 @@ namespace Gsage {
     lua["imgui"]["createDockspace"] = [&](const std::string& name){
       return std::make_shared<ImguiDockspaceView>(this, name);
     };
+
+    ImVue::registerBindings(L);
   }
 
-  bool ImguiManager::handleMouseEvent(EventDispatcher* sender, const Event& event)
+  bool ImguiManager::processMouseEvent(EventDispatcher* sender, const MouseEvent& e)
   {
     if(!mRenderer || mContexts.size() == 0)
       return true;
 
-    const MouseEvent& e = static_cast<const MouseEvent&>(event);
     mRenderer->setMousePosition(e.dispatcher, ImVec2(e.mouseX, e.mouseY));
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel += e.relativeZ / 100;
 
     io.MouseDown[e.button] = e.getType() == MouseEvent::MOUSE_DOWN;
-    return !doCapture() || e.getType() == MouseEvent::MOUSE_UP;
+    //return UIManager::processMouseEvent(sender, e);
+    return !captureMouse() || e.getType() == MouseEvent::MOUSE_UP;
   }
 
   const std::string& ImguiManager::getType()
@@ -455,7 +456,7 @@ namespace Gsage {
     LOG(INFO) << "Render interface for render system " << type << " was installed";
     mRendererFactories[type] = f;
     if(mPendingSystemType == type) {
-      setUp();
+      createRenderer(NULL);
       mPendingSystemType = "";
       mUsedRendererType = type;
     }
@@ -465,17 +466,15 @@ namespace Gsage {
   {
     mRendererFactories.erase(type);
     if(mUsedRendererType == type && mRenderer) {
-      tearDown();
+      shutdown();
       LOG(INFO) << "Renderer plugin \"" << type <<  "\" was removed, renderer was destroyed";
     }
   }
 
-  bool ImguiManager::handleKeyboardEvent(EventDispatcher* sender, const Event& event)
+  bool ImguiManager::processKeyEvent(EventDispatcher* sender, const KeyboardEvent& e)
   {
     if(!mRenderer || mContexts.size() == 0)
       return true;
-
-    const KeyboardEvent& e = static_cast<const KeyboardEvent&>(event);
 
     ImGuiIO& io = ImGui::GetIO();
     io.KeysDown[e.key] = e.getType() == KeyboardEvent::KEY_DOWN;
@@ -486,31 +485,38 @@ namespace Gsage {
     io.KeyAlt = e.isModifierDown(KeyboardEvent::Alt);
     io.KeySuper = e.isModifierDown(KeyboardEvent::Win);
 
-    return !ImGui::IsAnyItemActive() || e.getType() == KeyboardEvent::KEY_UP;
+    return true;
+    //return UIManager::processKeyEvent(sender, e);
   }
 
-  bool ImguiManager::handleInputEvent(EventDispatcher* sender, const Event& event)
+  bool ImguiManager::processInputEvent(EventDispatcher* sender, const TextInputEvent& e)
   {
     if(!mRenderer || mContexts.size() == 0)
       return true;
 
-    const TextInputEvent& e = static_cast<const TextInputEvent&>(event);
 
     ImGuiIO& io = ImGui::GetIO();
     io.AddInputCharactersUTF8(e.getText());
-
     return true;
   }
 
-  bool ImguiManager::doCapture()
+  bool ImguiManager::captureMouse() const
   {
     return ImGui::GetIO().WantCaptureMouse;
   }
 
-  bool ImguiManager::render(EventDispatcher* dispatcher, const Event& e)
+  bool ImguiManager::captureKey() const
   {
+    return ImGui::IsAnyItemActive();
+  }
+
+  void ImguiManager::newFrame()
+  {
+    if(!mRenderer) {
+      return;
+    }
+
     mRenderer->render();
-    return true;
   }
 
   ImGuiContext* ImguiManager::getImGuiContext(std::string name, const ImVec2& initialSize)
@@ -565,9 +571,6 @@ namespace Gsage {
     style.Colors[ImGuiCol_Header]                = colors.get("header", ImVec4(0.36f, 0.36f, 0.36f, 1.00f));
     style.Colors[ImGuiCol_HeaderHovered]         = colors.get("headerHovered", ImVec4(0.36f, 0.36f, 0.36f, 1.00f));
     style.Colors[ImGuiCol_HeaderActive]          = colors.get("headerActive", ImVec4(0.36f, 0.36f, 0.36f, 1.00f));
-    style.Colors[ImGuiCol_Column]                = colors.get("column", ImVec4(0.39f, 0.39f, 0.39f, 1.00f));
-    style.Colors[ImGuiCol_ColumnHovered]         = colors.get("columnHovered", ImVec4(0.26f, 0.59f, 0.98f, 1.00f));
-    style.Colors[ImGuiCol_ColumnActive]          = colors.get("columnActive", ImVec4(0.26f, 0.59f, 0.98f, 1.00f));
     style.Colors[ImGuiCol_ResizeGrip]            = colors.get("resizeGrip", ImVec4(0.36f, 0.36f, 0.36f, 1.00f));
     style.Colors[ImGuiCol_ResizeGripHovered]     = colors.get("resizeGripHovered", ImVec4(0.26f, 0.59f, 0.98f, 1.00f));
     style.Colors[ImGuiCol_ResizeGripActive]      = colors.get("resizeGripActive", ImVec4(0.26f, 0.59f, 0.98f, 1.00f));
@@ -669,7 +672,7 @@ namespace Gsage {
       mFontAtlas = io.Fonts;
     }
 
-    io.MouseDrawCursor = mFacade->getEngine()->settings().get("imgui.drawCursor", true);
+    io.MouseDrawCursor = mFacade->getEngine()->settings().get("imgui.drawCursor", false);
 
     io.DisplaySize = initialSize;
     ImGui::NewFrame();
@@ -696,6 +699,9 @@ namespace Gsage {
     io.KeyMap[ImGuiKey_Z] = KeyboardEvent::KC_Z;
     io.KeyMap[ImGuiKey_Space] = KeyboardEvent::KC_SPACE;
     mContexts[name] = ctx;
+
+    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+    io.BackendPlatformName = "imgui_impl_gsage";
 
     mFacade->getEngine()->fireEvent(ImguiEvent(ImguiEvent::CONTEXT_CREATED, name));
     return ctx;

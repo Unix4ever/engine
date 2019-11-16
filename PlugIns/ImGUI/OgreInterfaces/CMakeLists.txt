@@ -2,7 +2,6 @@ set(LIB_NAME "ImGUIOgreRenderer")
 
 include_directories(
   ${gsage_SOURCE_DIR}/PlugIns/ImGUI/Common/include
-  ${gsage_SOURCE_DIR}/Vendor/imgui
   ${gsage_SOURCE_DIR}/Vendor/easylogging/include
   ${gsage_SOURCE_DIR}/Vendor/cpp-channel/include
   ${gsage_SOURCE_DIR}/Vendor/sole
@@ -14,7 +13,7 @@ include_directories(
 set(LIBS
   OgrePlugin
   GsageCore
-  imgui
+  ${CONAN_LIBS_IMVUE}
   ImGUIPlugin
   cpp-channel
 )

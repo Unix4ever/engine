@@ -32,7 +32,7 @@ const Event::Type MouseEvent::MOUSE_DOWN = "mouseDown";
 const Event::Type MouseEvent::MOUSE_UP = "mouseUp";
 const Event::Type MouseEvent::MOUSE_MOVE = "mouseMove";
 
-MouseEvent::MouseEvent(Event::ConstType type, double w, double h, ButtonType b, const std::string& dispatcher) 
+MouseEvent::MouseEvent(Event::ConstType type, float w, float h, ButtonType b, const std::string& dispatcher) 
   : Event(type)
   , width(w)
   , height(h)

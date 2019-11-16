@@ -19,13 +19,13 @@ ImguiWindow = class(function(self, label, docked, open)
     self.imguiBegin = function(self)
       local active
       active, self.open = imgui.BeginDockTitleOpen(self.label, self:getLocalizedTitle(), self.open, self.flags, self.dockFlags)
-      if imgui.IsMouseHoveringWindow() and imgui.IsMouseDown(1) then
+      if imgui.IsWindowHovered() and imgui.IsMouseDown(1) then
         imgui.SetWindowFocus()
       end
       return active
     end
     self.imguiEnd = function(self)
-      self.dragging = imgui.IsMouseDragging(0) and imgui.IsMouseHoveringWindow()
+      self.dragging = imgui.IsMouseDragging(0) and imgui.IsWindowHovered()
       self:updateContext()
       imgui.EndDock()
     end
@@ -33,13 +33,13 @@ ImguiWindow = class(function(self, label, docked, open)
     self.imguiBegin = function(self)
       local active
       active, self.open = imgui.Begin(self.label, self.open, self.flags)
-      if imgui.IsMouseHoveringWindow() and imgui.IsMouseDown(1) then
+      if imgui.IsWindowHovered() and imgui.IsMouseDown(1) then
         imgui.SetWindowFocus()
       end
       return active
     end
     self.imguiEnd = function(self)
-      self.dragging = imgui.IsMouseDragging(0) and imgui.IsMouseHoveringWindow()
+      self.dragging = imgui.IsMouseDragging(0) and imgui.IsWindowHovered()
       self:updateContext()
       imgui.End()
     end

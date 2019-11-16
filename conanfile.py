@@ -31,7 +31,7 @@ class GsageConan(ConanFile):
         "shared=False",
         "with_ois=False",
         "with_ogre=disabled",
-        "with_librocket=False",
+        "with_librocket=True",
         "with_lua_version=luajit-2.0.5",
         "with_recast=True",
         "with_metal=False",
@@ -49,8 +49,8 @@ class GsageConan(ConanFile):
         ("inja/2.0.1@gsage/master",),
         ("jsonformoderncpp/3.5.0@gsage/master",),
         ("Poco/1.9.0@pocoproject/stable",),
-        ("imgui/1.71@gsage/master",),
         ("imgui-node-editor/1.0.0@gsage/master",),
+        ("imvue/1.0.0@gsage/master",),
     )
 
     def source(self):

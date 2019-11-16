@@ -203,8 +203,6 @@ namespace Gsage {
 
 
       lua["ogre"]["AUTODETECT_RESOURCE_GROUP_NAME"] = Ogre::ResourceGroupManager::AUTODETECT_RESOURCE_GROUP_NAME;
-      // fixel formats
-      lua["ogre"]["PF_R8G8B8A8"] = Ogre::PF_R8G8B8A8;
       // texture unit types
       lua["ogre"]["TU_DEFAULT"] = Ogre::TU_DEFAULT;
       lua["ogre"]["TU_RENDERTARGET"] = Ogre::TU_RENDERTARGET;

@@ -107,7 +107,11 @@ namespace Gsage {
             return CastHandler<T>().read(this, key, dest);
           } catch (...) {
             Json::ValueType jsonType = getJsonType<T>();
-            LOG(WARNING) << "Exception in cast handler when trying to object as json type: " << jsonType << ", actual type: " << getObject()[key].type();
+            LOG(WARNING) << "Exception in cast handler when trying to read " <<
+                     key << " as json type: " <<
+                     jsonType << ", actual type: " <<
+                     getObject()[key].type() << ", json:\n" <<
+                     toString(true);
             return false;
           }
         }

@@ -54,11 +54,23 @@ THE SOFTWARE.
 
 #include "OgreSelectEvent.h"
 #include "MouseEvent.h"
+#include "UIContextEvent.h"
 #include "Engine.h"
 
 #include "components/RenderComponent.h"
 
 namespace Gsage {
+
+  void extractMatrix(Ogre::Matrix4 matrix, float* dest)
+  {
+    int k = 0;
+    for(int i = 0; i < 4; i++) {
+      for(int j = 0; j < 4; j++) {
+        dest[k++] = (float)matrix[j][i];
+      }
+    }
+  }
+
 
   RenderTarget::RenderTarget(const std::string& name, RenderTargetType::Type type, const DataProxy& parameters, Engine* engine)
     : mName(name)
@@ -121,6 +133,7 @@ namespace Gsage {
 
   RenderTarget::~RenderTarget()
   {
+    mEngine->fireEvent(UIContextEvent(UIContextEvent::DESTROY, mName));
     mDestroying = true;
 #if OGRE_VERSION_MAJOR == 2
     destroyCurrentWorkspace();
@@ -225,6 +238,11 @@ namespace Gsage {
     return std::make_tuple(result, target);
   }
 
+  void RenderTarget::renderOverlay()
+  {
+    mEngine->fireEvent(UIContextEvent(UIContextEvent::RENDER, mName, mWidth, mHeight));
+  }
+
   void RenderTarget::doRaycasting(float offsetX, float offsetY, unsigned int flags, bool select)
   {
     Ogre::MovableObject* target;
@@ -289,6 +307,8 @@ namespace Gsage {
     switchToDefaultCamera();
 
     mCollisionTools = std::make_shared<MOC::CollisionTools>(mSceneManager);
+
+    mEngine->fireEvent(UIContextEvent(UIContextEvent::CREATE, mName, mWidth, mHeight));
   }
 
   int RenderTarget::getWidth() const
@@ -321,12 +341,31 @@ namespace Gsage {
     mHeight = height;
 
     updateCameraAspectRatio();
+    mEngine->fireEvent(UIContextEvent(UIContextEvent::RESIZE, mName, mWidth, mHeight));
   }
 
   void RenderTarget::setPosition(int x, int y)
   {
     mX = x;
     mY = y;
+  }
+
+  void RenderTarget::getViewMatrix(float* dest) const
+  {
+    if(!mCurrentCamera) {
+      memset(dest, 0, sizeof(float) * 16);
+      return;
+    }
+    extractMatrix(mCurrentCamera->getViewMatrix(), dest);
+  }
+
+  void RenderTarget::getProjectionMatrix(float* dest) const
+  {
+    if(!mCurrentCamera) {
+      memset(dest, 0, sizeof(float) * 16);
+      return;
+    }
+    extractMatrix(mCurrentCamera->getProjectionMatrix(), dest);
   }
 
   void RenderTarget::setCamera(Ogre::Camera* camera)
@@ -358,7 +397,7 @@ namespace Gsage {
 
     auto backgroundColor = mParameters.get<Ogre::ColourValue>("viewport.backgroundColor", Ogre::ColourValue::Black);
 
-    LOG(INFO) << "Create workspace " << workspaceName;
+    LOG(DEBUG) << "Create workspace " << workspaceName;
     if(!compositorManager->hasWorkspaceDefinition(workspaceName)) {
       compositorManager->createBasicWorkspaceDef(workspaceName, backgroundColor, Ogre::IdString());
     }
@@ -390,7 +429,7 @@ namespace Gsage {
 #if OGRE_VERSION_MAJOR == 1
       mWrappedTarget->update();
 #else
-      if(mWorkspace) {
+      if(mWorkspace && mCurrentCamera) {
         mWorkspace->_update();
       }
 #endif
@@ -474,7 +513,7 @@ namespace Gsage {
       Ogre::Root::getSingletonPtr()->getCompositorManager2()->removeWorkspace(mWorkspace);
       mWorkspace = 0;
       const Ogre::String workspaceName(mParameters.get("workspaceName", "basic"));
-      LOG(INFO) << "Delete workspace " << workspaceName;
+      LOG(DEBUG) << "Delete workspace " << workspaceName;
     }
   }
 #endif
@@ -533,7 +572,7 @@ namespace Gsage {
         mWidth,
         mHeight,
         mSamples,
-        Ogre::PF_R8G8B8A8
+        PF_R8G8B8A8
     );
   }
 
@@ -545,7 +584,7 @@ namespace Gsage {
       unsigned int width,
       unsigned int height,
       unsigned int samples,
-      Ogre::PixelFormat pixelFormat) {
+      PixelFormat pixelFormat) {
 
     OgreRenderSystem* rs = mEngine->getSystem<OgreRenderSystem>();
     if(!rs) {
@@ -565,7 +604,7 @@ namespace Gsage {
     params.put("width", width);
     params.put("height", height);
     params.put("fsaa", samples);
-    params.put("pixelFormat", pixelFormat);
+    params.put("pixelFormat", (int)pixelFormat);
     params.put("usage", (unsigned int)Ogre::TU_RENDERTARGET);
 
     TexturePtr texture = rs->getTexture(name);
@@ -645,8 +684,8 @@ namespace Gsage {
       params["parentWindowHandle"] = handle;
 #endif
     }
-    mWidth = parameters.get("width", 1024) * parameters.get("scale", 1);
-    mHeight = parameters.get("height", 768) * parameters.get("scale", 1);
+    mWidth = parameters.get("width", 1024);
+    mHeight = parameters.get("height", 768);
 
     Ogre::RenderWindow* window = Ogre::Root::getSingletonPtr()->createRenderWindow(
         parameters.get("name", "default"),

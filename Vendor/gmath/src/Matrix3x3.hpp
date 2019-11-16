@@ -34,6 +34,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include "Defs.h"
 
 /**
  * Attempt to include a header file if the file exists.
@@ -53,36 +54,36 @@ namespace Gsage {
     {
       struct
       {
-        double X;
-        double Y;
-        double Z;
+        Real X;
+        Real Y;
+        Real Z;
       };
-      double data[3];
+      Real data[3];
     };
 
     inline Vector3() : X(0), Y(0), Z(0) {}
-    inline Vector3(double data[]) : X(data[0]), Y(data[1]), Z(data[2])
+    inline Vector3(Real data[]) : X(data[0]), Y(data[1]), Z(data[2])
     {}
-    inline Vector3(double value) : X(value), Y(value), Z(value) {}
-    inline Vector3(double x, double y) : X(x), Y(y), Z(0) {}
-    inline Vector3(double x, double y, double z) : X(x), Y(y), Z(z) {}
+    inline Vector3(Real value) : X(value), Y(value), Z(value) {}
+    inline Vector3(Real x, Real y) : X(x), Y(y), Z(0) {}
+    inline Vector3(Real x, Real y, Real z) : X(x), Y(y), Z(z) {}
 
     static inline Vector3 Cross(Vector3 lhs, Vector3 rhs)
     {
-      double x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
-      double y = lhs.Z * rhs.X - lhs.X * rhs.Z;
-      double z = lhs.X * rhs.Y - lhs.Y * rhs.X;
+      Real x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
+      Real y = lhs.Z * rhs.X - lhs.X * rhs.Z;
+      Real z = lhs.X * rhs.Y - lhs.Y * rhs.X;
       return Vector3(x, y, z);
     }
 
-    static inline double Dot(Vector3 lhs, Vector3 rhs)
+    static inline Real Dot(Vector3 lhs, Vector3 rhs)
     {
       return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
     }
 
     static inline Vector3 Normalized(Vector3 v)
     {
-      double mag = sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
+      Real mag = sqrt(v.X * v.X + v.Y * v.Y + v.Z * v.Z);
       if (mag == 0)
         return Vector3::Zero();
       return v / mag;
@@ -94,7 +95,7 @@ namespace Gsage {
         Vector3(v.Y, -v.X, 0) : Vector3(0, -v.Z, v.Y);
     }
 
-    static inline double SqrMagnitude(Vector3 v)
+    static inline Real SqrMagnitude(Vector3 v)
     {
       return v.X * v.X + v.Y * v.Y + v.Z * v.Z;
     }
@@ -106,7 +107,7 @@ namespace Gsage {
     return Vector3(lhs.X + rhs.X, lhs.Y + rhs.Y, lhs.Z + rhs.Z);
   }
 
-  inline Vector3 operator*(Vector3 lhs, const double rhs)
+  inline Vector3 operator*(Vector3 lhs, const Real rhs)
   {
     return Vector3(lhs.X * rhs, lhs.Y * rhs, lhs.Z * rhs);
   }
@@ -134,20 +135,20 @@ namespace Gsage {
     {
       struct
       {
-        double X;
-        double Y;
-        double Z;
-        double W;
+        Real X;
+        Real Y;
+        Real Z;
+        Real W;
       };
-      double data[4];
+      Real data[4];
     };
 
     inline Quaternion() : X(0), Y(0), Z(0), W(1) {}
-    inline Quaternion(double data[]) : X(data[0]), Y(data[1]),
+    inline Quaternion(Real data[]) : X(data[0]), Y(data[1]),
     Z(data[2]), W(data[3]) {}
-    inline Quaternion(Vector3 vector, double scalar) : X(vector.X),
+    inline Quaternion(Vector3 vector, Real scalar) : X(vector.X),
     Y(vector.Y), Z(vector.Z), W(scalar) {}
-    inline Quaternion(double x, double y, double z, double w) : X(x),
+    inline Quaternion(Real x, Real y, Real z, Real w) : X(x),
     Y(y), Z(z), W(w) {}
   };
 }
@@ -163,17 +164,17 @@ namespace Gsage {
     {
       struct
       {
-        double D00;
-        double D01;
-        double D02;
-        double D10;
-        double D11;
-        double D12;
-        double D20;
-        double D21;
-        double D22;
+        Real D00;
+        Real D01;
+        Real D02;
+        Real D10;
+        Real D11;
+        Real D12;
+        Real D20;
+        Real D21;
+        Real D22;
       };
-      double data[3][3];
+      Real data[3][3];
     };
 
 
@@ -181,10 +182,10 @@ namespace Gsage {
      * Constructors.
      */
     inline Matrix3x3();
-    inline Matrix3x3(double data[]);
+    inline Matrix3x3(Real data[]);
     inline Matrix3x3(Vector3 row0, Vector3 row1, Vector3 row2);
-    inline Matrix3x3(double d00, double d01, double d02, double d10, double d11,
-        double d12, double d20, double d21, double d22);
+    inline Matrix3x3(Real d00, Real d01, Real d02, Real d10, Real d11,
+        Real d12, Real d20, Real d21, Real d22);
 
 
     /**
@@ -200,7 +201,7 @@ namespace Gsage {
      * @param matrix: The input matrix.
      * @return: A scalar value.
      */
-    static inline double Determinate(Matrix3x3 matrix);
+    static inline Real Determinate(Matrix3x3 matrix);
 
     /**
      * Converts a quaternion to a rotation matrix.
@@ -248,23 +249,23 @@ namespace Gsage {
     /**
      * Operator overloading.
      */
-    inline struct Matrix3x3& operator+=(const double rhs);
-    inline struct Matrix3x3& operator-=(const double rhs);
-    inline struct Matrix3x3& operator*=(const double rhs);
-    inline struct Matrix3x3& operator/=(const double rhs);
+    inline struct Matrix3x3& operator+=(const Real rhs);
+    inline struct Matrix3x3& operator-=(const Real rhs);
+    inline struct Matrix3x3& operator*=(const Real rhs);
+    inline struct Matrix3x3& operator/=(const Real rhs);
     inline struct Matrix3x3& operator+=(const Matrix3x3 rhs);
     inline struct Matrix3x3& operator-=(const Matrix3x3 rhs);
     inline struct Matrix3x3& operator*=(const Matrix3x3 rhs);
   };
 
   inline Matrix3x3 operator-(Matrix3x3 rhs);
-  inline Matrix3x3 operator+(Matrix3x3 lhs, const double rhs);
-  inline Matrix3x3 operator-(Matrix3x3 lhs, const double rhs);
-  inline Matrix3x3 operator*(Matrix3x3 lhs, const double rhs);
-  inline Matrix3x3 operator/(Matrix3x3 lhs, const double rhs);
-  inline Matrix3x3 operator+(const double lhs, Matrix3x3 rhs);
-  inline Matrix3x3 operator-(const double lhs, Matrix3x3 rhs);
-  inline Matrix3x3 operator*(const double lhs, Matrix3x3 rhs);
+  inline Matrix3x3 operator+(Matrix3x3 lhs, const Real rhs);
+  inline Matrix3x3 operator-(Matrix3x3 lhs, const Real rhs);
+  inline Matrix3x3 operator*(Matrix3x3 lhs, const Real rhs);
+  inline Matrix3x3 operator/(Matrix3x3 lhs, const Real rhs);
+  inline Matrix3x3 operator+(const Real lhs, Matrix3x3 rhs);
+  inline Matrix3x3 operator-(const Real lhs, Matrix3x3 rhs);
+  inline Matrix3x3 operator*(const Real lhs, Matrix3x3 rhs);
   inline Matrix3x3 operator+(Matrix3x3 lhs, const Matrix3x3 rhs);
   inline Matrix3x3 operator-(Matrix3x3 lhs, const Matrix3x3 rhs);
   inline Matrix3x3 operator*(Matrix3x3 lhs, const Matrix3x3 rhs);
@@ -280,14 +281,14 @@ namespace Gsage {
 
   Matrix3x3::Matrix3x3() : D00(1), D01(0), D02(0), D10(0), D11(1), D12(0), D20(0),
   D21(0), D22(1) {}
-  Matrix3x3::Matrix3x3(double data[]) : D00(data[0]), D01(data[1]), D02(data[2]),
+  Matrix3x3::Matrix3x3(Real data[]) : D00(data[0]), D01(data[1]), D02(data[2]),
   D10(data[3]), D11(data[4]), D12(data[5]), D20(data[6]), D21(data[7]),
   D22(data[8]) {}
   Matrix3x3::Matrix3x3(Vector3 row0, Vector3 row1, Vector3 row2) : D00(row0.X),
   D01(row0.Y), D02(row0.Z), D10(row1.X), D11(row1.Y), D12(row1.Z),
   D20(row2.X), D21(row2.Y), D22(row2.Z) {}
-  Matrix3x3::Matrix3x3(double d00, double d01, double d02, double d10, double d11,
-      double d12, double d20, double d21, double d22) : D00(d00), D01(d01),
+  Matrix3x3::Matrix3x3(Real d00, Real d01, Real d02, Real d10, Real d11,
+      Real d12, Real d20, Real d21, Real d22) : D00(d00), D01(d01),
   D02(d02), D10(d10), D11(d11), D12(d12), D20(d20), D21(d21), D22(d22) {}
 
 
@@ -307,13 +308,13 @@ namespace Gsage {
   }
 
 
-  double Matrix3x3::Determinate(Matrix3x3 matrix)
+  Real Matrix3x3::Determinate(Matrix3x3 matrix)
   {
-    double v1 = matrix.D00 * (matrix.D22 * matrix.D11 -
+    Real v1 = matrix.D00 * (matrix.D22 * matrix.D11 -
         matrix.D21 * matrix.D12);
-    double v2 = matrix.D10 * (matrix.D22 * matrix.D01 -
+    Real v2 = matrix.D10 * (matrix.D22 * matrix.D01 -
         matrix.D21 * matrix.D02);
-    double v3 = matrix.D20 * (matrix.D12 * matrix.D01 -
+    Real v3 = matrix.D20 * (matrix.D12 * matrix.D01 -
         matrix.D11 * matrix.D02);
     return v1 - v2 + v3;
   }
@@ -321,18 +322,18 @@ namespace Gsage {
   Matrix3x3 Matrix3x3::FromQuaternion(Quaternion rotation)
   {
     Matrix3x3 m;
-    double sqw = rotation.W * rotation.W;
-    double sqx = rotation.X * rotation.X;
-    double sqy = rotation.Y * rotation.Y;
-    double sqz = rotation.Z * rotation.Z;
+    Real sqw = rotation.W * rotation.W;
+    Real sqx = rotation.X * rotation.X;
+    Real sqy = rotation.Y * rotation.Y;
+    Real sqz = rotation.Z * rotation.Z;
 
-    double invSqr = 1 / (sqx + sqy + sqz + sqw);
+    Real invSqr = 1 / (sqx + sqy + sqz + sqw);
     m.D00 = (sqx - sqy - sqz + sqw) * invSqr;
     m.D11 = (-sqx + sqy - sqz + sqw) * invSqr;
     m.D22 = (-sqx - sqy + sqz + sqw) * invSqr;
 
-    double tmp1 = rotation.X * rotation.Y;
-    double tmp2 = rotation.Z * rotation.W;
+    Real tmp1 = rotation.X * rotation.Y;
+    Real tmp2 = rotation.Z * rotation.W;
     m.D10 = 2.0 * (tmp1 + tmp2) * invSqr;
     m.D01 = 2.0 * (tmp1 - tmp2) * invSqr;
 
@@ -385,10 +386,10 @@ namespace Gsage {
   Quaternion Matrix3x3::ToQuaternion(Matrix3x3 rotation)
   {
     Quaternion q;
-    double trace = rotation.D00 + rotation.D11 + rotation.D22;
+    Real trace = rotation.D00 + rotation.D11 + rotation.D22;
     if (trace > 0)
     {
-      double s = 0.5 / sqrt(trace + 1);
+      Real s = 0.5 / sqrt(trace + 1);
       q.W = 0.25 / s;
       q.X = (rotation.D21 - rotation.D12) * s;
       q.Y = (rotation.D02 - rotation.D20) * s;
@@ -398,7 +399,7 @@ namespace Gsage {
     {
       if (rotation.D00 > rotation.D11 && rotation.D00 > rotation.D22)
       {
-        double s = 2 * sqrt(1 + rotation.D00 - rotation.D11 - rotation.D22);
+        Real s = 2 * sqrt(1 + rotation.D00 - rotation.D11 - rotation.D22);
         q.W = (rotation.D21 - rotation.D12) / s;
         q.X = 0.25 * s;
         q.Y = (rotation.D01 + rotation.D10) / s;
@@ -406,7 +407,7 @@ namespace Gsage {
       }
       else if (rotation.D11 > rotation.D22)
       {
-        double s = 2 * sqrt(1 + rotation.D11 - rotation.D00 - rotation.D22);
+        Real s = 2 * sqrt(1 + rotation.D11 - rotation.D00 - rotation.D22);
         q.W = (rotation.D02 - rotation.D20) / s;
         q.X = (rotation.D01 + rotation.D10) / s;
         q.Y = 0.25 * s;
@@ -414,7 +415,7 @@ namespace Gsage {
       }
       else
       {
-        double s = 2 * sqrt(1 + rotation.D22 - rotation.D00 - rotation.D11);
+        Real s = 2 * sqrt(1 + rotation.D22 - rotation.D00 - rotation.D11);
         q.W = (rotation.D10 - rotation.D01) / s;
         q.X = (rotation.D02 + rotation.D20) / s;
         q.Y = (rotation.D12 + rotation.D21) / s;
@@ -426,7 +427,7 @@ namespace Gsage {
 
   Matrix3x3 Matrix3x3::Transpose(Matrix3x3 matrix)
   {
-    double tmp;
+    Real tmp;
     tmp = matrix.D01;
     matrix.D01 = matrix.D10;
     matrix.D10 = tmp;
@@ -440,7 +441,7 @@ namespace Gsage {
   }
 
 
-  struct Matrix3x3& Matrix3x3::operator+=(const double rhs)
+  struct Matrix3x3& Matrix3x3::operator+=(const Real rhs)
   {
     D00 += rhs; D01 += rhs; D02 += rhs;
     D10 += rhs; D11 += rhs; D12 += rhs;
@@ -448,7 +449,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Matrix3x3& Matrix3x3::operator-=(const double rhs)
+  struct Matrix3x3& Matrix3x3::operator-=(const Real rhs)
   {
     D00 -= rhs; D01 -= rhs; D02 -= rhs;
     D10 -= rhs; D11 -= rhs; D12 -= rhs;
@@ -456,7 +457,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Matrix3x3& Matrix3x3::operator*=(const double rhs)
+  struct Matrix3x3& Matrix3x3::operator*=(const Real rhs)
   {
     D00 *= rhs; D01 *= rhs; D02 *= rhs;
     D10 *= rhs; D11 *= rhs; D12 *= rhs;
@@ -464,7 +465,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Matrix3x3& Matrix3x3::operator/=(const double rhs)
+  struct Matrix3x3& Matrix3x3::operator/=(const Real rhs)
   {
     D00 /= rhs; D01 /= rhs; D02 /= rhs;
     D10 /= rhs; D11 /= rhs; D12 /= rhs;
@@ -505,13 +506,13 @@ namespace Gsage {
   }
 
   Matrix3x3 operator-(Matrix3x3 rhs) { return rhs * -1; }
-  Matrix3x3 operator+(Matrix3x3 lhs, const double rhs) { return lhs += rhs; }
-  Matrix3x3 operator-(Matrix3x3 lhs, const double rhs) { return lhs -= rhs; }
-  Matrix3x3 operator*(Matrix3x3 lhs, const double rhs) { return lhs *= rhs; }
-  Matrix3x3 operator/(Matrix3x3 lhs, const double rhs) { return lhs /= rhs; }
-  Matrix3x3 operator+(const double lhs, Matrix3x3 rhs) { return rhs += lhs; }
-  Matrix3x3 operator-(const double lhs, Matrix3x3 rhs) { return rhs -= lhs; }
-  Matrix3x3 operator*(const double lhs, Matrix3x3 rhs) { return rhs *= lhs; }
+  Matrix3x3 operator+(Matrix3x3 lhs, const Real rhs) { return lhs += rhs; }
+  Matrix3x3 operator-(Matrix3x3 lhs, const Real rhs) { return lhs -= rhs; }
+  Matrix3x3 operator*(Matrix3x3 lhs, const Real rhs) { return lhs *= rhs; }
+  Matrix3x3 operator/(Matrix3x3 lhs, const Real rhs) { return lhs /= rhs; }
+  Matrix3x3 operator+(const Real lhs, Matrix3x3 rhs) { return rhs += lhs; }
+  Matrix3x3 operator-(const Real lhs, Matrix3x3 rhs) { return rhs -= lhs; }
+  Matrix3x3 operator*(const Real lhs, Matrix3x3 rhs) { return rhs *= lhs; }
   Matrix3x3 operator+(Matrix3x3 lhs, const Matrix3x3 rhs) { return lhs += rhs; }
   Matrix3x3 operator-(Matrix3x3 lhs, const Matrix3x3 rhs) { return lhs -= rhs; }
   Matrix3x3 operator*(Matrix3x3 lhs, const Matrix3x3 rhs) { return lhs *= rhs; }

@@ -51,7 +51,6 @@ THE SOFTWARE.
 #include "ImguiDefinitions.h"
 
 #if OGRE_VERSION >= 0x020100
-#include <RenderSystems/GL3Plus/OgreGL3PlusRenderSystem.h>
 #include <CommandBuffer/OgreCbDrawCall.h>
 #include <CommandBuffer/OgreCbPipelineStateObject.h>
 #include <CommandBuffer/OgreCommandBuffer.h>
@@ -268,6 +267,7 @@ namespace Gsage {
             mPass->getVertexProgramParameters(), Ogre::GPV_GLOBAL);
         if(texUnitState) {
           mSceneMgr->getDestinationRenderSystem()->_setTextureUnitSettings(0, *texUnitState);
+          mSceneMgr->getDestinationRenderSystem()->_setTexture(0, true, texUnitState->_getTexturePtr().get());
         }
 
         Ogre::v1::CbRenderOp op(renderOp);

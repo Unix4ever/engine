@@ -114,6 +114,7 @@ namespace Gsage {
     std::string cmd = std::string("/C ") + command;
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
 
+    // TODO: remove this absolute path. This will cause issues if windows folder is different
     if(!CreateProcess("c:\\Windows\\System32\\cmd.exe", (LPSTR)cmd.c_str(), NULL, NULL, TRUE,
               CREATE_NO_WINDOW | CREATE_PRESERVE_CODE_AUTHZ_LEVEL, NULL, NULL, &siStartInfo, &piProcInfo)) {
       std::stringstream ss;

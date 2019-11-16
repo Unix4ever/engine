@@ -35,6 +35,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <type_traits>
+#include "Defs.h"
 
 namespace Gsage {
 
@@ -44,11 +45,11 @@ namespace Gsage {
     {
       struct
       {
-        double X;
-        double Y;
-        double Z;
+        Real X;
+        Real Y;
+        Real Z;
       };
-      double data[3];
+      Real data[3];
     };
 
 
@@ -56,16 +57,16 @@ namespace Gsage {
      * Constructors.
      */
     inline Vector3();
-    inline Vector3(double data[]);
-    inline Vector3(double value);
-    inline Vector3(double x, double y);
-    inline Vector3(double x, double y, double z);
+    inline Vector3(Real data[]);
+    inline Vector3(Real value);
+    inline Vector3(Real x, Real y);
+    inline Vector3(Real x, Real y, Real z);
 
     template<class T, std::enable_if_t<std::is_integral<T>::value>>
     inline Vector3(T vals[]) {
-      data[0] = (double)vals[0];
-      data[1] = (double)vals[1];
-      data[2] = (double)vals[2];
+      data[0] = (Real)vals[0];
+      data[1] = (Real)vals[1];
+      data[2] = (Real)vals[2];
     };
 
     /**
@@ -87,7 +88,7 @@ namespace Gsage {
      * @param b: The second vector.
      * @return: A scalar value.
      */
-    static inline double Angle(Vector3 a, Vector3 b);
+    static inline Real Angle(Vector3 a, Vector3 b);
 
     /**
      * Returns a vector with its magnitude clamped to maxLength.
@@ -95,7 +96,7 @@ namespace Gsage {
      * @param maxLength: The maximum length of the return vector.
      * @return: A new vector.
      */
-    static inline Vector3 ClampMagnitude(Vector3 vector, double maxLength);
+    static inline Vector3 ClampMagnitude(Vector3 vector, Real maxLength);
 
     /**
      * Returns the component of a in the direction of b (scalar projection).
@@ -103,7 +104,7 @@ namespace Gsage {
      * @param b: The vector being compared against.
      * @return: A scalar value.
      */
-    static inline double Component(Vector3 a, Vector3 b);
+    static inline Real Component(Vector3 a, Vector3 b);
 
     /**
      * Returns the cross product of two vectors.
@@ -119,7 +120,7 @@ namespace Gsage {
      * @param b: The second point.
      * @return: A scalar value.
      */
-    static inline double Distance(Vector3 a, Vector3 b);
+    static inline Real Distance(Vector3 a, Vector3 b);
 
     /**
      * Returns the dot product of two vectors.
@@ -127,7 +128,7 @@ namespace Gsage {
      * @param rhs: The right side of the multiplication.
      * @return: A scalar value.
      */
-    static inline double Dot(Vector3 lhs, Vector3 rhs);
+    static inline Real Dot(Vector3 lhs, Vector3 rhs);
 
     /**
      * Converts a spherical representation of a vector into cartesian
@@ -138,7 +139,7 @@ namespace Gsage {
      * @param phi: The angle from the positive Z axis to the vector.
      * @return: A new vector.
      */
-    static inline Vector3 FromSpherical(double rad, double theta, double phi);
+    static inline Vector3 FromSpherical(Real rad, Real theta, Real phi);
 
     /**
      * Returns a vector linearly interpolated between a and b, moving along
@@ -148,7 +149,7 @@ namespace Gsage {
      * @param t: The interpolation value [0-1].
      * @return: A new vector.
      */
-    static inline Vector3 Lerp(Vector3 a, Vector3 b, double t);
+    static inline Vector3 Lerp(Vector3 a, Vector3 b, Real t);
 
     /**
      * Returns a vector linearly interpolated between a and b, moving along
@@ -158,14 +159,14 @@ namespace Gsage {
      * @param t: The interpolation value [0-1] (no actual bounds).
      * @return: A new vector.
      */
-    static inline Vector3 LerpUnclamped(Vector3 a, Vector3 b, double t);
+    static inline Vector3 LerpUnclamped(Vector3 a, Vector3 b, Real t);
 
     /**
      * Returns the magnitude of a vector.
      * @param v: The vector in question.
      * @return: A scalar value.
      */
-    static inline double Magnitude(Vector3 v);
+    static inline Real Magnitude(Vector3 v);
 
     /**
      * Returns a vector made from the largest components of two other vectors.
@@ -192,7 +193,7 @@ namespace Gsage {
      * @return: A new vector.
      */
     static inline Vector3 MoveTowards(Vector3 current, Vector3 target,
-        double maxDistanceDelta);
+        Real maxDistanceDelta);
 
     /**
      * Returns a new vector with magnitude of one.
@@ -272,8 +273,8 @@ namespace Gsage {
      * @return: A new vector.
      */
     static inline Vector3 RotateTowards(Vector3 current, Vector3 target,
-        double maxRadiansDelta,
-        double maxMagnitudeDelta);
+        Real maxRadiansDelta,
+        Real maxMagnitudeDelta);
 
     /**
      * Multiplies two vectors element-wise.
@@ -291,7 +292,7 @@ namespace Gsage {
      * @param b: The ending direction.
      * @param t: The interpolation value [0-1].
      */
-    static inline Vector3 Slerp(Vector3 a, Vector3 b, double t);
+    static inline Vector3 Slerp(Vector3 a, Vector3 b, Real t);
 
     /**
      * Returns a vector rotated towards b from a by the percent t.
@@ -301,7 +302,7 @@ namespace Gsage {
      * @param b: The ending direction.
      * @param t: The interpolation value [0-1].
      */
-    static inline Vector3 SlerpUnclamped(Vector3 a, Vector3 b, double t);
+    static inline Vector3 SlerpUnclamped(Vector3 a, Vector3 b, Real t);
 
     /**
      * Returns the squared magnitude of a vector.
@@ -311,7 +312,7 @@ namespace Gsage {
      * @param v: The vector in question.
      * @return: A scalar value.
      */
-    static inline double SqrMagnitude(Vector3 v);
+    static inline Real SqrMagnitude(Vector3 v);
 
     /**
      * Calculates the spherical coordinate space representation of a vector.
@@ -321,17 +322,17 @@ namespace Gsage {
      * @param theta: The angle in the XY plane from the X axis.
      * @param phi: The angle from the positive Z axis to the vector.
      */
-    static inline void ToSpherical(Vector3 vector, double &rad, double &theta,
-        double &phi);
+    static inline void ToSpherical(Vector3 vector, Real &rad, Real &theta,
+        Real &phi);
 
 
     /**
      * Operator overloading.
      */
-    inline struct Vector3& operator+=(const double rhs);
-    inline struct Vector3& operator-=(const double rhs);
-    inline struct Vector3& operator*=(const double rhs);
-    inline struct Vector3& operator/=(const double rhs);
+    inline struct Vector3& operator+=(const Real rhs);
+    inline struct Vector3& operator-=(const Real rhs);
+    inline struct Vector3& operator*=(const Real rhs);
+    inline struct Vector3& operator/=(const Real rhs);
     inline struct Vector3& operator+=(const Vector3 rhs);
     inline struct Vector3& operator-=(const Vector3 rhs);
     inline struct Vector3& operator*=(const Vector3 rhs);
@@ -345,14 +346,14 @@ namespace Gsage {
   };
 
   inline Vector3 operator-(Vector3 rhs);
-  inline Vector3 operator+(Vector3 lhs, const double rhs);
-  inline Vector3 operator-(Vector3 lhs, const double rhs);
-  inline Vector3 operator*(Vector3 lhs, const double rhs);
-  inline Vector3 operator/(Vector3 lhs, const double rhs);
-  inline Vector3 operator+(const double lhs, Vector3 rhs);
-  inline Vector3 operator-(const double lhs, Vector3 rhs);
-  inline Vector3 operator*(const double lhs, Vector3 rhs);
-  inline Vector3 operator/(const double lhs, Vector3 rhs);
+  inline Vector3 operator+(Vector3 lhs, const Real rhs);
+  inline Vector3 operator-(Vector3 lhs, const Real rhs);
+  inline Vector3 operator*(Vector3 lhs, const Real rhs);
+  inline Vector3 operator/(Vector3 lhs, const Real rhs);
+  inline Vector3 operator+(const Real lhs, Vector3 rhs);
+  inline Vector3 operator-(const Real lhs, Vector3 rhs);
+  inline Vector3 operator*(const Real lhs, Vector3 rhs);
+  inline Vector3 operator/(const Real lhs, Vector3 rhs);
   inline Vector3 operator+(Vector3 lhs, const Vector3 rhs);
   inline Vector3 operator-(Vector3 lhs, const Vector3 rhs);
   inline bool operator==(const Vector3 lhs, const Vector3 rhs);
@@ -365,10 +366,10 @@ namespace Gsage {
    */
 
   Vector3::Vector3() : X(0), Y(0), Z(0) {}
-  Vector3::Vector3(double data[]) : X(data[0]), Y(data[1]), Z(data[2]) {}
-  Vector3::Vector3(double value) : X(value), Y(value), Z(value) {}
-  Vector3::Vector3(double x, double y) : X(x), Y(y), Z(0) {}
-  Vector3::Vector3(double x, double y, double z) : X(x), Y(y), Z(z) {}
+  Vector3::Vector3(Real data[]) : X(data[0]), Y(data[1]), Z(data[2]) {}
+  Vector3::Vector3(Real value) : X(value), Y(value), Z(value) {}
+  Vector3::Vector3(Real x, Real y) : X(x), Y(y), Z(0) {}
+  Vector3::Vector3(Real x, Real y, Real z) : X(x), Y(y), Z(z) {}
 
 
   Vector3 Vector3::Zero() { return Vector3(0, 0, 0); }
@@ -381,46 +382,46 @@ namespace Gsage {
   Vector3 Vector3::Backward() { return Vector3(0, 0, -1); }
 
 
-  double Vector3::Angle(Vector3 a, Vector3 b)
+  Real Vector3::Angle(Vector3 a, Vector3 b)
   {
-    double v = Dot(a, b) / (Magnitude(a) * Magnitude(b));
+    Real v = Dot(a, b) / (Magnitude(a) * Magnitude(b));
     v = fmax(v, -1.0);
     v = fmin(v, 1.0);
     return acos(v);
   }
 
-  Vector3 Vector3::ClampMagnitude(Vector3 vector, double maxLength)
+  Vector3 Vector3::ClampMagnitude(Vector3 vector, Real maxLength)
   {
-    double length = Magnitude(vector);
+    Real length = Magnitude(vector);
     if (length > maxLength)
       vector *= maxLength / length;
     return vector;
   }
 
-  double Vector3::Component(Vector3 a, Vector3 b)
+  Real Vector3::Component(Vector3 a, Vector3 b)
   {
     return Dot(a, b) / Magnitude(b);
   }
 
   Vector3 Vector3::Cross(Vector3 lhs, Vector3 rhs)
   {
-    double x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
-    double y = lhs.Z * rhs.X - lhs.X * rhs.Z;
-    double z = lhs.X * rhs.Y - lhs.Y * rhs.X;
+    Real x = lhs.Y * rhs.Z - lhs.Z * rhs.Y;
+    Real y = lhs.Z * rhs.X - lhs.X * rhs.Z;
+    Real z = lhs.X * rhs.Y - lhs.Y * rhs.X;
     return Vector3(x, y, z);
   }
 
-  double Vector3::Distance(Vector3 a, Vector3 b)
+  Real Vector3::Distance(Vector3 a, Vector3 b)
   {
     return Vector3::Magnitude(a - b);
   }
 
-  double Vector3::Dot(Vector3 lhs, Vector3 rhs)
+  Real Vector3::Dot(Vector3 lhs, Vector3 rhs)
   {
     return lhs.X * rhs.X + lhs.Y * rhs.Y + lhs.Z * rhs.Z;
   }
 
-  Vector3 Vector3::FromSpherical(double rad, double theta, double phi)
+  Vector3 Vector3::FromSpherical(Real rad, Real theta, Real phi)
   {
     Vector3 v;
     v.X = rad * sin(theta) * cos(phi);
@@ -429,44 +430,44 @@ namespace Gsage {
     return v;
   }
 
-  Vector3 Vector3::Lerp(Vector3 a, Vector3 b, double t)
+  Vector3 Vector3::Lerp(Vector3 a, Vector3 b, Real t)
   {
     if (t < 0) return a;
     else if (t > 1) return b;
     return LerpUnclamped(a, b, t);
   }
 
-  Vector3 Vector3::LerpUnclamped(Vector3 a, Vector3 b, double t)
+  Vector3 Vector3::LerpUnclamped(Vector3 a, Vector3 b, Real t)
   {
     return (b - a) * t + a;
   }
 
-  double Vector3::Magnitude(Vector3 v)
+  Real Vector3::Magnitude(Vector3 v)
   {
     return sqrt(SqrMagnitude(v));
   }
 
   Vector3 Vector3::Max(Vector3 a, Vector3 b)
   {
-    double x = a.X > b.X ? a.X : b.X;
-    double y = a.Y > b.Y ? a.Y : b.Y;
-    double z = a.Z > b.Z ? a.Z : b.Z;
+    Real x = a.X > b.X ? a.X : b.X;
+    Real y = a.Y > b.Y ? a.Y : b.Y;
+    Real z = a.Z > b.Z ? a.Z : b.Z;
     return Vector3(x, y, z);
   }
 
   Vector3 Vector3::Min(Vector3 a, Vector3 b)
   {
-    double x = a.X > b.X ? b.X : a.X;
-    double y = a.Y > b.Y ? b.Y : a.Y;
-    double z = a.Z > b.Z ? b.Z : a.Z;
+    Real x = a.X > b.X ? b.X : a.X;
+    Real y = a.Y > b.Y ? b.Y : a.Y;
+    Real z = a.Z > b.Z ? b.Z : a.Z;
     return Vector3(x, y, z);
   }
 
   Vector3 Vector3::MoveTowards(Vector3 current, Vector3 target,
-      double maxDistanceDelta)
+      Real maxDistanceDelta)
   {
     Vector3 d = target - current;
-    double m = Magnitude(d);
+    Real m = Magnitude(d);
     if (m < maxDistanceDelta || m == 0)
       return target;
     return current + (d * maxDistanceDelta / m);
@@ -474,7 +475,7 @@ namespace Gsage {
 
   Vector3 Vector3::Normalized(Vector3 v)
   {
-    double mag = Magnitude(v);
+    Real mag = Magnitude(v);
     if (mag == 0)
       return Vector3::Zero();
     return v / mag;
@@ -498,7 +499,7 @@ namespace Gsage {
 
   Vector3 Vector3::Project(Vector3 a, Vector3 b)
   {
-    double m = Magnitude(b);
+    Real m = Magnitude(b);
     return Dot(a, b) / (m * m) * b;
   }
 
@@ -518,24 +519,24 @@ namespace Gsage {
   }
 
   Vector3 Vector3::RotateTowards(Vector3 current, Vector3 target,
-      double maxRadiansDelta,
-      double maxMagnitudeDelta)
+      Real maxRadiansDelta,
+      Real maxMagnitudeDelta)
   {
-    double magCur = Magnitude(current);
-    double magTar = Magnitude(target);
-    double newMag = magCur + maxMagnitudeDelta *
+    Real magCur = Magnitude(current);
+    Real magTar = Magnitude(target);
+    Real newMag = magCur + maxMagnitudeDelta *
       ((magTar > magCur) - (magCur > magTar));
     newMag = fmin(newMag, fmax(magCur, magTar));
     newMag = fmax(newMag, fmin(magCur, magTar));
 
-    double totalAngle = Angle(current, target) - maxRadiansDelta;
+    Real totalAngle = Angle(current, target) - maxRadiansDelta;
     if (totalAngle <= 0)
       return Normalized(target) * newMag;
     else if (totalAngle >= M_PI)
       return Normalized(-target) * newMag;
 
     Vector3 axis = Cross(current, target);
-    double magAxis = Magnitude(axis);
+    Real magAxis = Magnitude(axis);
     if (magAxis == 0)
       axis = Normalized(Cross(current, current + Vector3(3.95, 5.32, -4.24)));
     else
@@ -551,38 +552,38 @@ namespace Gsage {
     return Vector3(a.X * b.X, a.Y * b.Y, a.Z * b.Z);
   }
 
-  Vector3 Vector3::Slerp(Vector3 a, Vector3 b, double t)
+  Vector3 Vector3::Slerp(Vector3 a, Vector3 b, Real t)
   {
     if (t < 0) return a;
     else if (t > 1) return b;
     return SlerpUnclamped(a, b, t);
   }
 
-  Vector3 Vector3::SlerpUnclamped(Vector3 a, Vector3 b, double t)
+  Vector3 Vector3::SlerpUnclamped(Vector3 a, Vector3 b, Real t)
   {
-    double magA = Magnitude(a);
-    double magB = Magnitude(b);
+    Real magA = Magnitude(a);
+    Real magB = Magnitude(b);
     a /= magA;
     b /= magB;
-    double dot = Dot(a, b);
+    Real dot = Dot(a, b);
     dot = fmax(dot, -1.0);
     dot = fmin(dot, 1.0);
-    double theta = acos(dot) * t;
+    Real theta = acos(dot) * t;
     Vector3 relativeVec = Normalized(b - a * dot);
     Vector3 newVec = a * cos(theta) + relativeVec * sin(theta);
     return newVec * (magA + (magB - magA) * t);
   }
 
-  double Vector3::SqrMagnitude(Vector3 v)
+  Real Vector3::SqrMagnitude(Vector3 v)
   {
     return v.X * v.X + v.Y * v.Y + v.Z * v.Z;
   }
 
-  void Vector3::ToSpherical(Vector3 vector, double &rad, double &theta,
-      double &phi)
+  void Vector3::ToSpherical(Vector3 vector, Real &rad, Real &theta,
+      Real &phi)
   {
     rad = Magnitude(vector);
-    double v = vector.Z / rad;
+    Real v = vector.Z / rad;
     v = fmax(v, -1.0);
     v = fmin(v, 1.0);
     theta = acos(v);
@@ -590,7 +591,7 @@ namespace Gsage {
   }
 
 
-  struct Vector3& Vector3::operator+=(const double rhs)
+  struct Vector3& Vector3::operator+=(const Real rhs)
   {
     X += rhs;
     Y += rhs;
@@ -598,7 +599,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Vector3& Vector3::operator-=(const double rhs)
+  struct Vector3& Vector3::operator-=(const Real rhs)
   {
     X -= rhs;
     Y -= rhs;
@@ -606,7 +607,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Vector3& Vector3::operator*=(const double rhs)
+  struct Vector3& Vector3::operator*=(const Real rhs)
   {
     X *= rhs;
     Y *= rhs;
@@ -614,7 +615,7 @@ namespace Gsage {
     return *this;
   }
 
-  struct Vector3& Vector3::operator/=(const double rhs)
+  struct Vector3& Vector3::operator/=(const Real rhs)
   {
     X /= rhs;
     Y /= rhs;
@@ -655,14 +656,14 @@ namespace Gsage {
   }
 
   Vector3 operator-(Vector3 rhs) { return rhs * -1; }
-  Vector3 operator+(Vector3 lhs, const double rhs) { return lhs += rhs; }
-  Vector3 operator-(Vector3 lhs, const double rhs) { return lhs -= rhs; }
-  Vector3 operator*(Vector3 lhs, const double rhs) { return lhs *= rhs; }
-  Vector3 operator/(Vector3 lhs, const double rhs) { return lhs /= rhs; }
-  Vector3 operator+(const double lhs, Vector3 rhs) { return rhs += lhs; }
-  Vector3 operator-(const double lhs, Vector3 rhs) { return rhs -= lhs; }
-  Vector3 operator*(const double lhs, Vector3 rhs) { return rhs *= lhs; }
-  Vector3 operator/(const double lhs, Vector3 rhs) { return rhs /= lhs; }
+  Vector3 operator+(Vector3 lhs, const Real rhs) { return lhs += rhs; }
+  Vector3 operator-(Vector3 lhs, const Real rhs) { return lhs -= rhs; }
+  Vector3 operator*(Vector3 lhs, const Real rhs) { return lhs *= rhs; }
+  Vector3 operator/(Vector3 lhs, const Real rhs) { return lhs /= rhs; }
+  Vector3 operator+(const Real lhs, Vector3 rhs) { return rhs += lhs; }
+  Vector3 operator-(const Real lhs, Vector3 rhs) { return rhs -= lhs; }
+  Vector3 operator*(const Real lhs, Vector3 rhs) { return rhs *= lhs; }
+  Vector3 operator/(const Real lhs, Vector3 rhs) { return rhs /= lhs; }
   Vector3 operator+(Vector3 lhs, const Vector3 rhs) { return lhs += rhs; }
   Vector3 operator-(Vector3 lhs, const Vector3 rhs) { return lhs -= rhs; }
 

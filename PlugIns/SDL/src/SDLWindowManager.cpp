@@ -71,10 +71,11 @@ namespace Gsage {
     return hdpi/defaultDPI;
   }
 
-  SDLWindow::SDLWindow(const std::string& name, SDL_Window* window)
+  SDLWindow::SDLWindow(const std::string& name, SDL_Window* window, SDLWindow::Cursors& cursors)
     : Window(name)
     , mWindow(window)
     , mGLContext(nullptr)
+    , mCursors(cursors)
   {
   }
 
@@ -183,6 +184,24 @@ namespace Gsage {
     SDL_HideWindow(mWindow);
   }
 
+  void SDLWindow::setCursor(Window::Cursor c)
+  {
+    if(c >= mCursors.size()) {
+      c = Window::Cursor::Arrow;
+    }
+
+    if(c < 0) {
+      SDL_ShowCursor(SDL_FALSE);
+      return;
+    }
+
+    SDL_Cursor* cursor = mCursors[c];
+    if(cursor) {
+      SDL_SetCursor(cursor);
+      SDL_ShowCursor(SDL_TRUE);
+    }
+  }
+
   SDLWindowManager::SDLWindowManager(const std::string& type, SDLCore* core)
     : WindowManager(type)
     , mCore(core)
@@ -192,6 +211,10 @@ namespace Gsage {
 
   SDLWindowManager::~SDLWindowManager()
   {
+    while(mCursors.size() > 0) {
+      SDL_FreeCursor(mCursors[mCursors.size() - 1]);
+      mCursors.pop_back();
+    }
     mCore->setWindowManager(nullptr);
   }
 
@@ -203,6 +226,16 @@ namespace Gsage {
       return false;
     }
 
+    mCursors.resize(8);
+    mCursors[Window::Arrow] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
+    mCursors[Window::TextInput] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
+    mCursors[Window::ResizeAll] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+    mCursors[Window::ResizeNS] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+    mCursors[Window::ResizeEW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
+    mCursors[Window::ResizeNESW] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENESW);
+    mCursors[Window::ResizeNWSE] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENWSE);
+    mCursors[Window::Hand] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
+
     auto windows = config.get<DataProxy>("windows");
     if(!windows.second) {
       return true;
@@ -212,7 +245,6 @@ namespace Gsage {
       LOG(TRACE) << "Creating window " << pair.first;
       createWindow(pair.first, pair.second.get("width", 320), pair.second.get("height", 240), pair.second.get("fullscreen", false), pair.second);
     }
-
     return true;
   }
 
@@ -222,7 +254,7 @@ namespace Gsage {
     Uint32 flags = 0;
     int x = params.get("x", SDL_WINDOWPOS_UNDEFINED);
     int y = params.get("y", SDL_WINDOWPOS_UNDEFINED);
-    bool showCursor = params.get("showCursor", false);
+    bool showCursor = params.get("showCursor", true);
 
     std::map<std::string, Uint32> flagsMap;
     flagsMap["hidden"] = SDL_WINDOW_HIDDEN;
@@ -267,7 +299,7 @@ namespace Gsage {
       }
     }
 
-    SDLWindow* wrapper = new SDLWindow(name, window);
+    SDLWindow* wrapper = new SDLWindow(name, window, mCursors);
     if(sdlContext) {
       wrapper->mGLContext = sdlContext;
     }

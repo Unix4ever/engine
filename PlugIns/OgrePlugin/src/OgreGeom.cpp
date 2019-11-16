@@ -110,5 +110,4 @@ namespace Gsage {
   OgreGeom::~OgreGeom()
   {
   }
-
 }

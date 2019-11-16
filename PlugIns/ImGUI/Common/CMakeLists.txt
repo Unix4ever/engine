@@ -13,6 +13,7 @@ set(LIBS
   imgui
   imgui_node_editor
   imgui_canvas
+  ${CONAN_LIBS_IMVUE}
 )
 
 file(GLOB sources src/*.cpp)

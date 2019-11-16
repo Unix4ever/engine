@@ -2,9 +2,9 @@
 #  add_subdirectory(ParticleUniverse)
 #endif(${OGRE_Plugin_ParticleUniverse_FOUND})
 
-if(${LIBROCKET_FOUND} AND "${OGRE_VERSION_MAJOR}" STREQUAL "1")
-  add_subdirectory(RocketUI)
-endif(${LIBROCKET_FOUND} AND "${OGRE_VERSION_MAJOR}" STREQUAL "1")
+if(${LIBROCKET_FOUND})
+  #  add_subdirectory(RocketUI)
+endif(${LIBROCKET_FOUND})
 
 if(OIS_FOUND AND "${WITH_OIS}" STREQUAL "True")
   add_subdirectory(OisInput)
@@ -22,5 +22,6 @@ if(${RECAST_FOUND})
   add_subdirectory(RecastNavigation)
 endif(${RECAST_FOUND})
 
+add_subdirectory(ImVue)
 add_subdirectory(ImGUI)
 add_subdirectory(CEF)

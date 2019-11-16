@@ -39,7 +39,9 @@ namespace Gsage {
   class SDLWindow : public Window
   {
     public:
-      SDLWindow(const std::string& name, SDL_Window* window);
+      typedef std::vector<SDL_Cursor*> Cursors;
+
+      SDLWindow(const std::string& name, SDL_Window* window, Cursors& cursors);
       virtual ~SDLWindow();
 
       /**
@@ -104,10 +106,17 @@ namespace Gsage {
        */
       virtual void hide();
 
+      /**
+       * Set cursor
+       *
+       * @param c cursor ID
+       */
+      void setCursor(Window::Cursor c);
     private:
       friend class SDLWindowManager;
       SDL_Window* mWindow;
       SDL_GLContext mGLContext;
+      Cursors& mCursors;
   };
 
   /**
@@ -158,6 +167,7 @@ namespace Gsage {
       std::mutex mWindowsMutex;
       SDLCore* mCore;
       std::map<std::string, SDLRendererPtr> mRenderers;
+      SDLWindow::Cursors mCursors;
   };
 }
 

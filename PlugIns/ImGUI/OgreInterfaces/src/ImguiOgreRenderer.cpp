@@ -38,6 +38,7 @@ namespace Gsage {
   ImguiOgreRenderer::ImguiOgreRenderer()
     : mSceneMgr(0)
     , mUpdateFontTex(false)
+    , mCurrentCursor(ImGuiMouseCursor_Arrow)
   {
   }
 
@@ -117,21 +118,34 @@ namespace Gsage {
     mFontTexLock.unlock();
 
     mContextLock.lock();
+
     if(mContexts.count(name) == 0) {
       initializeContext(name);
     }
 
-    mContexts[name].size = ImVec2(
+    Context& ctx = mContexts.at(name);
+
+    ctx.size = ImVec2(
         (float)event.renderTarget->getWidth(),
         (float)event.renderTarget->getHeight()
     );
 
-    if(!mContexts[name].context) {
+    if(!ctx.context) {
       mContextLock.unlock();
       return true;
     }
-    ImGui::SetCurrentContext(mContexts[name].context);
-    updateVertexData(vp, mContexts[name].size);
+
+    if(mCurrentCursor != ImGui::GetMouseCursor()) {
+      mCurrentCursor = ImGui::GetMouseCursor();
+
+      WindowPtr window = event.renderTarget->getWindow();
+      if(window) {
+        window->setCursor((Window::Cursor)mCurrentCursor);
+      }
+    }
+
+    ImGui::SetCurrentContext(ctx.context);
+    updateVertexData(vp, ctx.size);
     mContextLock.unlock();
     return true;
   }

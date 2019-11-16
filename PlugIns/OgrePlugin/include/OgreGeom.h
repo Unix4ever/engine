@@ -29,6 +29,9 @@ THE SOFTWARE.
 
 #include "Definitions.h"
 #include "systems/RenderSystem.h"
+#include "OgrePrerequisites.h"
+#include "OgreRenderable.h"
+#include <OgreRenderOperation.h>
 
 namespace Ogre {
   class SceneNode;

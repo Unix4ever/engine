@@ -1,28 +1,23 @@
--- this entrypoint is a mess, which is used mostly for concepts test purposes
+package.path = package.path .. ';' .. getResourcePath('scripts/?.lua')
 
-package.path = package.path .. ';' .. getResourcePath('scripts/?.lua') ..
-                               ';' .. getResourcePath('behaviors/trees/?.lua') ..
-                               ";" .. getResourcePath('behaviors/?.lua') .. ";"
-
-local version = _VERSION:match("%d+%.%d+")
-package.path = ';' .. getResourcePath('luarocks/packages/share/lua/' .. version .. '/?.lua') ..
-               ';' .. getResourcePath('luarocks/packages/share/lua/' .. version .. '/?/init.lua') .. ';' .. package.path
-package.cpath = getResourcePath('luarocks/packages/lib/lua/' .. version .. '/?.so') .. ';' ..
-                getResourcePath('luarocks/packages/lib/lua/' .. version .. '/?.dll') .. ';' .. package.cpath
+local path = require 'lib.path'
+path:addDefaultPaths()
 
 require 'math'
 require 'helpers.base'
 require 'lib.behaviors'
-require 'actions'
 require 'factories.camera'
 require 'factories.emitters'
-
+local eal = require 'lib.eal.manager'
+local event = require 'lib.event'
+local lm = require 'lib.locales'
+local async = require 'lib.async'
+local bindings = require 'lib.bindings'
 local imguiInterface = require 'imgui.base'
 
 if imguiInterface:available() then
   require 'imgui.console'
   require 'imgui.stats'
-  require 'imgui.ogreView'
 end
 
 local event = require 'lib.event'
@@ -58,25 +53,15 @@ function initLibrocket(e)
     end
   end
 
-  main = resource.loadDocument(ctx, "minimal.rml")
-  console = resource.loadDocument(ctx, "console_document.rml")
-  healthbar = resource.loadDocument(ctx, "healthbar.rml")
-
-  cursor = resource.loadCursor(ctx, "cursor.rml")
-
+  main = resource.loadDocument(ctx, "rocket.rml")
   main:Show()
-  healthbar:Show()
-  main:AddEventListener('keydown', onKeyEvent, true)
 
-  console:AddEventListener('keydown', onKeyEvent, true)
-
-  event:onOgreSelect(core, SelectEvent.ROLL_OVER, onRoll)
-  event:onOgreSelect(core, SelectEvent.ROLL_OUT, onRoll)
 end
 
 -- librocket initialization
 if event.onRocketContext ~= nil then
   event:onRocketContext(core, RocketContextEvent.CREATE, initLibrocket)
+  event:onRocketContext(core, RocketContextEvent.DESTROY, initLibrocket)
 end
 
 function setOrbitalCam(id, cameraID)
@@ -115,7 +100,10 @@ function handleKeyEvent(e)
   end
 
   if e.key == Keys.KC_T and e.type == KeyboardEvent.KEY_DOWN then
-    selectTransform = true
+    --selectTransform = true
+    local ctx = imvue:getContext("Game")
+    --ctx:addDocument("test", "editor/simple.xml")
+    ctx:addDocument("editor", "editor/imvue/app.xml")
   end
 end
 
@@ -124,11 +112,6 @@ event:onKeyboard(core, KeyboardEvent.KEY_UP, handleKeyEvent)
 
 function onSelect(e)
   local target = eal:getEntity(e.entity)
-
-  if selectTransform then
-    ogreView:setGizmoTarget(target)
-    return
-  end
 
   if e:hasFlags(RenderComponent.DYNAMIC) then
     if actions.attackable(player, target) then
@@ -160,8 +143,6 @@ end
 
 event:onOgreSelect(core, SelectEvent.OBJECT_SELECTED, onSelect)
 event:bind(core, Facade.LOAD, onReady)
-console_visible = false
-game:loadSave('gameStart')
 
 if imguiInterface:available() then
   imguiConsole = Console(256)

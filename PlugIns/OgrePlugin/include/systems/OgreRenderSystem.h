@@ -211,6 +211,20 @@ namespace Gsage
        */
       virtual bool deleteTexture(RenderSystem::TextureHandle handle);
 
+      /**
+       * Gets render target as an abstract representation of rendered viewport
+       *
+       * @param name render target id
+       */
+      RenderViewport* getViewport(const std::string& name) {
+        RenderTargetPtr rt = getRenderTarget(name);
+        if(rt) {
+          return rt;
+        }
+
+        return nullptr;
+      }
+
       // --------------------------------------------------------------------------------
       // Ogre::RenderQueueListener implementation
       // --------------------------------------------------------------------------------
@@ -250,17 +264,17 @@ namespace Gsage
       /**
        * Get ogre render window
        */
-      Ogre::RenderWindow* getRenderWindow() { return static_cast<Ogre::RenderWindow*>(mWindow->getOgreRenderTarget()); }
+      inline Ogre::RenderWindow* getRenderWindow() { return static_cast<Ogre::RenderWindow*>(mWindow->getOgreRenderTarget()); }
 
       /**
        * Get ogre scene manager
        */
-      Ogre::SceneManager* getSceneManager() {return mSceneManager; }
+      inline Ogre::SceneManager* getSceneManager() {return mSceneManager; }
 
       /**
        * Get ogre render system
        */
-      Ogre::RenderSystem* getRenderSystem() {return mRenderSystem;}
+      inline Ogre::RenderSystem* getRenderSystem() {return mRenderSystem;}
 
       typedef std::vector<Entity*> Entities;
       /**
@@ -396,6 +410,11 @@ namespace Gsage
        * Gets object manager
        */
       inline OgreObjectManager* getObjectManager() { return &mObjectManager; }
+
+      /**
+       * Creates UI renderer
+       */
+      UIRendererPtr createUIRenderer() const;
     protected:
       /**
        * Handle window resizing
@@ -448,7 +467,6 @@ namespace Gsage
       typedef std::map<std::string, Ogre::Plugin*> OgrePlugins;
       OgrePlugins mOgrePlugins;
 #endif
-      ThreadSafeQueue<ObjectMutation> mMutationQueue;
 
       ManualTextureManager mManualTextureManager;
   };

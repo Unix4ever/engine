@@ -65,6 +65,7 @@ namespace Gsage {
     Ogre::SceneManager *sceneManager = render->getSceneManager();
     sceneManager->_setCurrentCompositorPass(this);
     sceneManager->_setCameraInProgress(target->getCamera());
+    target->renderOverlay();
     mEngine->fireEvent(RenderEvent(RenderEvent::RENDER_QUEUE_STARTED, render, 0, target));
     mEngine->fireEvent(RenderEvent(RenderEvent::RENDER_QUEUE_ENDED, render, 0, target));
     sceneManager->_setCameraInProgress(0);

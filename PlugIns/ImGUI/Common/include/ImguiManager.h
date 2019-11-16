@@ -33,6 +33,8 @@ THE SOFTWARE.
 #include "ImGuiDockspace.h"
 #include "ImguiExportHeader.h"
 #include "DataProxy.h"
+#include "imvue.h"
+#include "imvue_generated.h"
 
 #include "sol_forward.hpp"
 
@@ -187,7 +189,7 @@ namespace Gsage {
       ImguiManager* mManager;
   };
 
-  class IMGUI_PLUGIN_API ImguiManager : public UIManager, public EventSubscriber<ImguiManager>, public ImguiViewCollection
+  class IMGUI_PLUGIN_API ImguiManager : public UIManager, public ImguiViewCollection
   {
     public:
       typedef std::function<ImguiRenderer*()> RendererFactory;
@@ -218,24 +220,12 @@ namespace Gsage {
       /**
        * Configures rendering
        */
-      void setUp();
+      void createRenderer(RenderSystem* render);
 
       /**
        * Tear down imgui manager
        */
-      void tearDown();
-
-      /**
-       * SystemChangeEvent::SYSTEM_ADDED and SystemChangeEvent::SYSTEM_REMOVED handler
-       */
-      bool handleSystemChange(EventDispatcher* sender, const Event& event);
-      /**
-       * Handle mouse event from engine
-       *
-       * @param sender EventDispatcher
-       * @param event Event
-       */
-      bool handleMouseEvent(EventDispatcher* sender, const Event& event);
+      void shutdown();
 
       const std::string& getType();
 
@@ -264,24 +254,25 @@ namespace Gsage {
        * Render a single imgui frame
        */
       virtual void renderViews(ImguiRenderer::Context& ctx);
+
+      /**
+       * Add new ImVue document to the imgui renderer
+       */
+      bool addDocument(const std::string& name, const std::string& file);
+
+      void newFrame();
+
+    protected:
+
+      bool processInputEvent(EventDispatcher* sender, const TextInputEvent& event);
+      bool processMouseEvent(EventDispatcher* sender, const MouseEvent& event);
+      bool processKeyEvent(EventDispatcher* sender, const KeyboardEvent& event);
+
+      bool captureMouse() const;
+      bool captureKey() const;
+
     private:
       friend class ImguiDockspaceView;
-      /**
-       * Handle keyboard event from engine
-       */
-      bool handleKeyboardEvent(EventDispatcher* sender, const Event& event);
-      /**
-       * Handle input event from engine
-       */
-      bool handleInputEvent(EventDispatcher* sender, const Event& event);
-      /**
-       * Check if mouse event can be captured by any rocket element
-       */
-      bool doCapture();
-      /**
-       * This function does not handle actual render system rendering, it only updates ImGUI draw list
-       */
-      bool render(EventDispatcher* dispatcher, const Event& e);
 
       ImguiRenderer* mRenderer;
       ImFontAtlas* mFontAtlas;
@@ -303,6 +294,11 @@ namespace Gsage {
 
       std::map<std::string, ImGuiContext*> mContexts;
       ImGuiDockspaceRenderer* mCurrentDockspace;
+
+      ImGuiMouseCursor mCurrentCursor;
+
+      typedef std::map<std::string, ImVue::Document*> Documents;
+      Documents mDocuments;
   };
 }
 #endif

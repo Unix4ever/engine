@@ -34,6 +34,7 @@ THE SOFTWARE.
 #include "GeometryPrimitives.h"
 #include "DataProxy.h"
 #include "EventDispatcher.h"
+#include "GsageFacade.h"
 
 namespace Gsage {
   class RenderSystem;
@@ -47,11 +48,11 @@ namespace Gsage {
       Geom();
       virtual ~Geom();
 
-    /**
-      * Retrieves the vertices stored within this Geom. The verts are an array of floats in which each
-      * subsequent three floats are in order the x, y and z coordinates of a vert. The size of this array is
-      * always a multiple of three and is exactly 3*getVertCount().
-      **/
+      /**
+       * Retrieves the vertices stored within this Geom. The verts are an array of floats in which each
+       * subsequent three floats are in order the x, y and z coordinates of a vert. The size of this array is
+       * always a multiple of three and is exactly 3*getVertCount().
+       **/
       Verts getVerts();
 
       /**
@@ -207,7 +208,7 @@ namespace Gsage {
       std::string mHandle;
 
       std::mutex mLock;
-      
+
     private:
 
       void deleteBuffer();
@@ -215,9 +216,221 @@ namespace Gsage {
 
   typedef std::shared_ptr<Texture> TexturePtr;
 
-  class RenderSystem
+  // UI Rendering -------------------------------
+
+  // ui render operation vertex type
+  struct GSAGE_API UIVertex {
+    float x, y;
+    float u, v;
+    unsigned int diffuse;
+  };
+
+  // ui render operation index type
+  typedef unsigned short UIIndex;
+
+  /**
+   * Abstract UI geometry primitive
+   *
+   * Represents a single render operation
+   * Contains vertex and index buffers
+   */
+  class GSAGE_API UIGeom {
+    public:
+      UIGeom()
+        : x(0)
+        , y(0)
+        , scLeft(0)
+        , scTop(0)
+        , scBottom(INT_MAX)
+        , scRight(INT_MAX)
+        , texture(nullptr)
+      {
+      }
+
+      virtual ~UIGeom()
+      {
+      }
+
+      virtual void updateVertexData(
+          const void* vertices,
+          const void* indices,
+          size_t numVertices,
+          size_t numIndices,
+          size_t vertexSize = sizeof(UIVertex),
+          size_t indexSize = sizeof(UIIndex)
+      ) = 0;
+
+      float x;
+      float y;
+      int scLeft;
+      int scTop;
+      int scBottom;
+      int scRight;
+      TexturePtr texture;
+  };
+
+  typedef std::shared_ptr<UIGeom> UIGeomPtr;
+
+  /**
+   * Abstract representation of texture that is displayed at screen
+   */
+  class GSAGE_API RenderViewport
   {
     public:
+      RenderViewport()
+        : mWindow(nullptr)
+      {
+      }
+      // gets render target window
+      inline WindowPtr getWindow() {
+        return mWindow;
+      }
+
+      virtual inline void setWindow(WindowPtr window)
+      {
+        mWindow = window;
+      }
+      /**
+       * Change viewport resolution
+       *
+       * @param width pixels
+       * @param height pixels
+       */
+      virtual void setDimensions(int width, int height) = 0;
+
+      /**
+       * Set viewport position
+       * This is used for mouse event handling
+       *
+       * @param x
+       * @param y
+       */
+      virtual void setPosition(int x, int y) = 0;
+
+      /**
+       * Get viewport resolution
+       */
+      virtual Vector2 getDimensions() const = 0;
+
+      /**
+       * Get viewport position
+       */
+      virtual Vector2 getPosition() const = 0;
+
+      /**
+       * Read current camera view matrix
+       * If there is no current camera will return zero matrix
+       *
+       * @param dest must be float c array of size 16
+       */
+      virtual void getViewMatrix(float* dest) const = 0;
+
+      /**
+       * Read current camera projection matrix
+       * If there is no current camera will return zero matrix
+       *
+       * @param dest must be float c array of size 16
+       */
+      virtual void getProjectionMatrix(float* dest) const = 0;
+    protected:
+      WindowPtr mWindow;
+  };
+
+  /**
+   * Abstract UIRenderer to render geometry
+   */
+  class GSAGE_API UIRenderer
+  {
+    public:
+      /**
+       * UIRenderer configuration
+       */
+      struct Configuration {
+        bool valid;
+        SceneBlendType blendType;
+        SceneBlendOperation blendOperation;
+        SceneBlendOperation blendOperationAlpha;
+        SceneBlendFactor srcBlendFactor;
+        SceneBlendFactor dstBlendFactor;
+        SceneBlendFactor srcBlendFactorAlpha;
+        SceneBlendFactor dstBlendFactorAlpha;
+        CullingMode cullMode;
+        TextureFilterOptions texFiltering;
+      };
+
+      static Configuration createConfiguration()
+      {
+        Configuration res;
+        memset(&res, 0, sizeof(Configuration));
+        res.valid = true;
+        res.blendType = SceneBlendType::SBT_TRANSPARENT_ALPHA;
+        res.blendOperation = SceneBlendOperation::SBO_ADD;
+        res.blendOperationAlpha = SceneBlendOperation::SBO_ADD;
+      }
+
+      UIRenderer();
+
+      /**
+       * Set up UIRenderer
+       *
+       * @param config renderer material options
+       * @param render system used for set up
+       * @param mgrName UI manager name
+       */
+      virtual void initialize(Configuration& config, RenderSystem* render, const std::string& mgrName) {
+        mRender = render;
+      }
+
+      /**
+       * Start rendering new frame
+       *
+       * @param ctxName context name
+       */
+      virtual void begin(const std::string& ctxName) = 0;
+
+      /**
+       * Frame rendering end hook
+       */
+      virtual void end() {}
+
+      /**
+       * Create ui geometry
+       * Must be implemented in render system to return geom specific to the render system
+       */
+      virtual UIGeomPtr createUIGeom() const = 0;
+
+      /**
+       * Renders ui geometry
+       *
+       * @param geom must get concrete render system implementation
+       */
+      virtual void renderUIGeom(UIGeomPtr geom) = 0;
+
+      /**
+       * Create texture
+       *
+       * @param name texture name
+       * @param data texture data
+       * @param width texture width
+       * @param height texture height
+       */
+      TexturePtr createTexture(const char* name, void* data, int width, int height, PixelFormat pixelFormat = PixelFormat::PF_R8G8B8A8);
+
+      /**
+       * Get render target by ID
+       */
+      RenderViewport* getViewport(const char* name);
+    protected:
+      RenderSystem* mRender;
+  };
+
+  typedef std::shared_ptr<UIRenderer> UIRendererPtr;
+
+  class GSAGE_API RenderSystem
+  {
+    public:
+      static size_t getPixelSize(PixelFormat format);
+
       typedef std::string TextureHandle;
 
       RenderSystem();
@@ -263,6 +476,25 @@ namespace Gsage {
        * @returns true if succeed
        */
       virtual bool deleteTexture(RenderSystem::TextureHandle handle) = 0;
+
+      /**
+       * Get viewport with name
+       *
+       * @param name unique viewport ID
+       */
+      virtual RenderViewport* getViewport(const std::string& name) = 0;
+
+      /**
+       * Create UI renderer
+       *
+       * Must be overridden by render systems to support UI rendering
+       * Called by UIManager implementation to set up rendering and then use this renderer to display elements
+       */
+      virtual UIRendererPtr createUIRenderer() const
+      {
+        LOG(WARNING) << "Render system does not support UI rendering";
+        return nullptr;
+      }
   };
 }
 

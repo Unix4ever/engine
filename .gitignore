@@ -15,7 +15,6 @@ docs/latex
 docs/xml
 *.dumped
 resources/workspace.json
-resources/gameConfig.json
 resources/plugins.cfg
 resources/testConfig.json
 resources/editorConfig.json
