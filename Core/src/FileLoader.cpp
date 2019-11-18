@@ -29,7 +29,9 @@ THE SOFTWARE.
 #include <Poco/Path.h>
 #include <Poco/File.h>
 #include "ScopedLocale.h"
-
+#include <nlohmann/json.hpp>
+#define nssv_CPLUSPLUS 201103L
+#include <inja/inja.hpp>
 
 namespace Gsage {
   inline nlohmann::json jsonContext(const DataProxy& dp)

@@ -253,7 +253,8 @@ namespace Gsage {
             }
 
             return w->openDialog(mode, title, defaultFilePath, actualFilters);
-        }
+        },
+        "createWindow", &WindowManager::createWindow
     );
 
     lua.new_usertype<Filesystem>("Filesystem",
@@ -292,6 +293,7 @@ namespace Gsage {
     lua.new_usertype<Window>("Window",
         "new", sol::no_constructor,
         "getWindowHandle", &Window::getWindowHandle,
+        "getGLContext", &Window::getGLContext,
         "getPosition", &Window::getPosition,
         "setPosition", &Window::setPosition,
         "getSize", &Window::getSize,
@@ -314,16 +316,16 @@ namespace Gsage {
     );
 
     auto vector3 = sol::usertype<Vector3>(
-        sol::constructors<sol::types<double, double, double>>(),
+        sol::constructors<sol::types<Real, Real, Real>>(),
         "x", &Vector3::X,
         "y", &Vector3::Y,
         "z", &Vector3::Z,
         "squaredDistance", [](Vector3 rhs, const Vector3 lhs) {
-          double distance = Vector3::Distance(rhs, lhs);
+          Real distance = Vector3::Distance(rhs, lhs);
           return distance * distance;
         },
         "crossProduct", [](Vector3 rhs, const Vector3 lhs) { return Vector3::Cross(rhs, lhs); },
-        "clamp", [](Vector3 rhs, double maxLength) { return Vector3::ClampMagnitude(rhs, maxLength); },
+        "clamp", [](Vector3 rhs, Real maxLength) { return Vector3::ClampMagnitude(rhs, maxLength); },
         "ZERO", sol::property([] () { return Vector3(0, 0, 0); }),
         "UNIT_X", sol::property([] () { return Vector3(1, 0, 0); }),
         "UNIT_Y", sol::property([] () { return Vector3(0, 1, 0); }),
@@ -334,13 +336,13 @@ namespace Gsage {
         "UNIT_SCALE", sol::property([] () { return Vector3(1, 1, 1); }),
         sol::meta_function::multiplication, sol::overload(
           [](Vector3 rhs, const Vector3 lhs) { return rhs *= lhs; },
-          [](Vector3 rhs, const double lhs) { return rhs * lhs; }
+          [](Vector3 rhs, const Real lhs) { return rhs * lhs; }
         ),
         sol::meta_function::addition, [](Vector3 rhs, const Vector3 lhs) { return rhs + lhs; },
         sol::meta_function::equal_to, [](const Vector3& rhs, const Vector3& lhs) { return rhs == lhs; },
         sol::meta_function::division, sol::overload(
             [](Vector3 rhs, const Vector3& lhs) { return rhs /= lhs; },
-            [](Vector3 rhs, double lhs) { return rhs / lhs; }
+            [](Vector3 rhs, Real lhs) { return rhs / lhs; }
         )
     );
 
@@ -351,8 +353,8 @@ namespace Gsage {
 
     auto quaternion = sol::usertype<Quaternion>(
         "new", sol::factories(
-          [](double w, double x, double y, double z) { return std::make_shared<Quaternion>(x, y, z, w); },
-          [](double scalar, Vector3 vector) {return std::make_shared<Quaternion>(vector, scalar); }
+          [](Real w, Real x, Real y, Real z) { return std::make_shared<Quaternion>(x, y, z, w); },
+          [](Real scalar, Vector3 vector) {return std::make_shared<Quaternion>(vector, scalar); }
         ),
         "w", &Quaternion::W,
         "x", &Quaternion::X,
@@ -397,9 +399,9 @@ namespace Gsage {
     auto geometry = lua.create_table();
 
     // shortcuts (can be overwritten in 3D library)
-    lua["Quaternion"] = lua.create_table_with("new", [](double w, double x, double y, double z) { return std::make_shared<Quaternion>(x, y, z, w); });
-    lua["Vector3"] = lua.create_table_with("new", [](double x, double y, double z){ return std::make_shared<Gsage::Vector3>(x, y, z); });
-    lua["Radian"] = lua.create_table_with("new", [](double value){ return std::make_shared<Gsage::Radian>(value); });
+    lua["Quaternion"] = lua.create_table_with("new", [](Real w, Real x, Real y, Real z) { return std::make_shared<Quaternion>(x, y, z, w); });
+    lua["Vector3"] = lua.create_table_with("new", [](Real x, Real y, Real z){ return std::make_shared<Gsage::Vector3>(x, y, z); });
+    lua["Radian"] = lua.create_table_with("new", [](Real value){ return std::make_shared<Gsage::Radian>(value); });
 
     geometry["X_AXIS"] = Geometry::X_AXIS;
     geometry["Y_AXIS"] = Geometry::Y_AXIS;

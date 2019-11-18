@@ -1,15 +1,22 @@
 <template>
-  <scene/>
+  <window name="works">
+    <scene/>
+  </window>
 </template>
 
 <script>
   -- add imvue components search path
   package.imvpath = package.imvpath .. ';' .. getResourcePath('editor/imvue/?.imv')
-
+  Scene = require 'components.scene'
   return ImVue.new({
     components = {
-      scene = require 'components.scene'
-    }
+      scene = Scene
+    },
+    data = function(self)
+      return {
+        showScene = false,
+      }
+    end,
   })
 </script>
 

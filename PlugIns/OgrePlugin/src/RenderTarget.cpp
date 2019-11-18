@@ -174,6 +174,10 @@ namespace Gsage {
 
   bool RenderTarget::handleMouseEvent(EventDispatcher* sender, const Event& event)
   {
+    if(!mWindow || !mWindow->focused()) {
+      return true;
+    }
+
     const MouseEvent& e = static_cast<const MouseEvent&>(event);
 
     if(e.dispatcher == mName || e.dispatcher != "main") {
@@ -430,6 +434,7 @@ namespace Gsage {
       mWrappedTarget->update();
 #else
       if(mWorkspace && mCurrentCamera) {
+        mSceneManager->updateSceneGraph();
         mWorkspace->_update();
       }
 #endif
@@ -683,6 +688,7 @@ namespace Gsage {
 #endif
       params["parentWindowHandle"] = handle;
 #endif
+      params["currentGLContext"] = parameters.get<std::string>("currentGLContext", "false");
     }
     mWidth = parameters.get("width", 1024);
     mHeight = parameters.get("height", 768);

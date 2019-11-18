@@ -1,13 +1,17 @@
 <template>
-  <viewport :bg-colour="self['bg-colour']" :texture-id="self['texture-id']"/>
+  <viewport :bg-colour="self['bg-colour']" :texture="self.texID"/>
 </template>
 
 <script>
+
+local camera = require 'factories.camera'
+local index = 0
+
 return {
   props = {
     ['bg-colour'] = {
       type = ImVue_Number,
-      default = 0x000000FF
+      default = 0xFF000000
     },
     ['texture-id'] = {
       type = ImVue_String,
@@ -15,7 +19,7 @@ return {
     },
     ['camera-name'] = {
       type = ImVue_String,
-      default = "scenecam"
+      default = nil
     },
     ['camera-type'] = {
       type = ImVue_String,
@@ -23,8 +27,10 @@ return {
     }
   },
   mounted = function(self)
+    self.texID = self['texture-id'] .. tostring(index)
     self.camera = camera:create(self['camera-type'], self['camera-name'], {})
-    local texture = self.camera:renderToTexture(self['texture-id'], {
+    self.camera:setEnabled(true)
+    local texture = self.camera:renderToTexture(self.texID, {
       autoUpdated = false,
       -- V2 workspace
       workspaceName = "ogreview",
@@ -42,6 +48,7 @@ return {
         }
       }
     })
+    index = index + 1
     local grid = eal:getEntity("__grid__")
     if not grid then
       local e = data:createEntity({

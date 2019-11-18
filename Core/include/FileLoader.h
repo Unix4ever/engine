@@ -28,9 +28,11 @@ THE SOFTWARE.
 */
 
 #include "DataProxy.h"
-#include <nlohmann/json.hpp>
-#include <inja/inja.hpp>
 #include <sol_forward.hpp>
+
+namespace inja {
+  class Environment;
+};
 
 namespace Gsage {
   /**

@@ -131,6 +131,11 @@ namespace Gsage {
        * @param c cursor type
        */
       virtual void setCursor(Cursor c) = 0;
+
+      /**
+       * Check if window is focused
+       */
+      virtual bool focused() const = 0;
     protected:
       std::string mName;
       Cursor mCurrentCursor;

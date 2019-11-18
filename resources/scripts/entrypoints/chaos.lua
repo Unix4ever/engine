@@ -102,8 +102,11 @@ function handleKeyEvent(e)
   if e.key == Keys.KC_T and e.type == KeyboardEvent.KEY_DOWN then
     --selectTransform = true
     local ctx = imvue:getContext("Game")
-    --ctx:addDocument("test", "editor/simple.xml")
-    ctx:addDocument("editor", "editor/imvue/app.xml")
+    ctx:addDocument("test", "editor/simple.xml")
+    print(pcall(function()
+      --print(ctx)
+      --ctx:addDocument("editor", "editor/imvue/app.xml")
+    end))
   end
 end
 

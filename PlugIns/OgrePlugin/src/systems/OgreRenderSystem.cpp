@@ -509,9 +509,6 @@ namespace Gsage {
 
     mEngine->fireEvent(RenderEvent(RenderEvent::UPDATE, this));
 
-#if OGRE_VERSION >= 0x020100
-    mSceneManager->updateSceneGraph();
-#endif
     for(auto pair : mRenderTargets) {
       if(!pair.second->isAutoUpdated()) {
         pair.second->update();

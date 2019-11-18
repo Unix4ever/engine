@@ -366,6 +366,7 @@ namespace Gsage {
         res.blendType = SceneBlendType::SBT_TRANSPARENT_ALPHA;
         res.blendOperation = SceneBlendOperation::SBO_ADD;
         res.blendOperationAlpha = SceneBlendOperation::SBO_ADD;
+        return res;
       }
 
       UIRenderer();

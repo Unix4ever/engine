@@ -112,6 +112,13 @@ namespace Gsage {
        * @param c cursor ID
        */
       void setCursor(Window::Cursor c);
+
+      /**
+       * Check if window is focused
+       */
+      bool focused() const {
+        return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_FOCUS;
+      }
     private:
       friend class SDLWindowManager;
       SDL_Window* mWindow;

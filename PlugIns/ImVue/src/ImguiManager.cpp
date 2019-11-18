@@ -44,6 +44,27 @@ THE SOFTWARE.
 
 namespace Gsage {
 
+  /**
+   * Runs scope in the context
+   * Reverts context back at the end of the lifespan
+   */
+  struct ContextScope {
+    ContextScope(ImGuiContext* ctx)
+      : active(ctx)
+    {
+      backup = ImGui::GetCurrentContext();
+      ImGui::SetCurrentContext(ctx);
+    }
+
+    ~ContextScope()
+    {
+      ImGui::SetCurrentContext(backup);
+    }
+
+    ImGuiContext* active;
+    ImGuiContext* backup;
+  };
+
 
   ImguiContext::ImguiContext(GsageFacade* facade)
     : mFacade(facade)
@@ -69,7 +90,7 @@ namespace Gsage {
     }
     mFrameStarted = true;
 
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImGuiIO& io = ImGui::GetIO();
     io.DeltaTime = std::max(
         delta,
@@ -105,7 +126,8 @@ namespace Gsage {
       mRenderable = mRenderer->createUIGeom();
     }
 
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
+
     ImGui::EndFrame();
     ImGui::Render();
     mRenderer->begin(mName);
@@ -247,7 +269,7 @@ namespace Gsage {
       style.ScaleAllSizes(scale);
     }
 
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImGuiIO& io = ImGui::GetIO();
     io.DisplayFramebufferScale = ImVec2(scale, scale);
     if(!mFontAtlas) {
@@ -360,7 +382,7 @@ namespace Gsage {
       .attribute("bg-colour", &ImguiViewport::bgColour)
       .attribute("texture", &ImguiViewport::textureID);
 
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImVue::Context* ctx = ImVue::createContext(
         factory,
         new ImVue::LuaScriptState(mFacade->getLuaState()),
@@ -381,25 +403,15 @@ namespace Gsage {
       return false;
     }
 
-    bool success = false;
-    try {
-      doc->parse(data);
-      success = true;
-    } catch (const ImVue::ElementError& err) {
-      LOG(ERROR) << "Failed to parse document " << file << " " << err.what();
-    } catch (const ImVue::ScriptError& err) {
-      LOG(ERROR) << "Failed to parse document " << file << " " << err.what();
-    } catch (...) {
-      LOG(ERROR) << "Failed to parse document " << file;
-    }
+    doc->parse(data);
     ImGui::MemFree(data);
     mDocuments[name] = doc;
-    return success;
+    return true;
   }
 
   bool ImguiContext::processMouseEvent(EventDispatcher* sender, const MouseEvent& e)
   {
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImGuiIO& io = ImGui::GetIO();
     io.MouseWheel += e.relativeZ / 100;
     io.MouseDown[e.button] = e.getType() == MouseEvent::MOUSE_DOWN;
@@ -409,7 +421,7 @@ namespace Gsage {
 
   bool ImguiContext::processKeyEvent(EventDispatcher* sender, const KeyboardEvent& e)
   {
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImGuiIO& io = ImGui::GetIO();
     io.KeysDown[e.key] = e.getType() == KeyboardEvent::KEY_DOWN;
 
@@ -424,7 +436,7 @@ namespace Gsage {
 
   bool ImguiContext::processInputEvent(EventDispatcher* sender, const TextInputEvent& e)
   {
-    ImGui::SetCurrentContext(mContext);
+    ContextScope cs(mContext);
     ImGuiIO& io = ImGui::GetIO();
     io.AddInputCharactersUTF8(e.getText());
     return UIContext::processInputEvent(sender, e);

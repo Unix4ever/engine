@@ -81,7 +81,7 @@ namespace Gsage {
       mTextureHandle.texture = mTexture;
     }
 
-    if(!mTexture || !mTexture->hasData()) {
+    if(!mTexture || !mTexture->hasData() || size.x <= 0 || size.y <= 0) {
       return;
     }
 
@@ -90,7 +90,7 @@ namespace Gsage {
     viewport->setPosition(pos.x, pos.y);
     Gsage::Vector2 texSize = mTexture->getSrcSize();
     mSize = ImVec2(texSize.X, texSize.Y);
-    ImGui::Image(&mTextureHandle, size); //mSize, mUV0, mUV1);
+    ImGui::Image(&mTextureHandle, size, mUV0, mUV1);
   }
 
   void ImguiViewport::setTexture(TexturePtr texture)

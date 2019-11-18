@@ -150,12 +150,12 @@ namespace Gsage {
 
   bool UIManager::handleMouseEvent(EventDispatcher* dispatcher, const Event& event)
   {
-    for(auto& pair : mContexts) {
-      if(!pair.second->processMouseEvent(dispatcher, static_cast<const MouseEvent&>(event))) {
-        return false;
-      }
+    const MouseEvent& e = static_cast<const MouseEvent&>(event);
+    if(mContexts.count(e.dispatcher) == 0) {
+      return false;
     }
 
+    mContexts[e.dispatcher]->processMouseEvent(dispatcher, e);
     return true;
   }
 
