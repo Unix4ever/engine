@@ -63,14 +63,20 @@ namespace Gsage {
         return;
       }
 
+      WindowPtr window;
+
       switch(event.type) {
         case SDL_WINDOWEVENT:
+          window = mWindowManager->getWindowByID(event.window.windowID);
+          if(!window) {
+            break;
+          }
           switch(event.window.event){
             case SDL_WINDOWEVENT_SIZE_CHANGED:
-              mFacade->getEngine()->fireEvent(WindowEvent(WindowEvent::RESIZE, event.window.windowID, event.window.data1, event.window.data2));
+              mFacade->getEngine()->fireEvent(WindowEvent(WindowEvent::RESIZE, window->getWindowHandle(), window->getName().c_str(), event.window.data1, event.window.data2));
               break;
             case SDL_WINDOWEVENT_MOVED:
-              mFacade->getEngine()->fireEvent(WindowEvent(WindowEvent::MOVE, event.window.windowID, 0, 0, event.window.data1, event.window.data2));
+              mFacade->getEngine()->fireEvent(WindowEvent(WindowEvent::MOVE, window->getWindowHandle(), window->getName().c_str(), 0, 0, event.window.data1, event.window.data2));
               break;
           }
           break;

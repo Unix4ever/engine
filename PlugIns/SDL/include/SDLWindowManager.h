@@ -119,6 +119,10 @@ namespace Gsage {
       bool focused() const {
         return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_FOCUS;
       }
+
+      inline Uint32 getWindowID() const {
+        return SDL_GetWindowID(mWindow);
+      }
     private:
       friend class SDLWindowManager;
       SDL_Window* mWindow;
@@ -169,12 +173,20 @@ namespace Gsage {
        * @param time Delta time
        */
       virtual void update(double time);
+
+      inline WindowPtr getWindowByID(Uint32 id) {
+        if(mWindowsByID.find(id) != mWindowsByID.end()) {
+          return mWindowsByID[id];
+        }
+        return nullptr;
+      }
     private:
       typedef std::unique_ptr<SDLRenderer> SDLRendererPtr;
       std::mutex mWindowsMutex;
       SDLCore* mCore;
       std::map<std::string, SDLRendererPtr> mRenderers;
       SDLWindow::Cursors mCursors;
+      std::map<Uint32, WindowPtr> mWindowsByID;
   };
 }
 

@@ -309,7 +309,7 @@ namespace Gsage {
     mWindowsMutex.lock();
     WindowPtr res = WindowPtr(wrapper);
     windowCreated(res);
-    fireWindowEvent(WindowEvent::CREATE, wrapper->getWindowHandle(), width, height);
+    fireWindowEvent(WindowEvent::CREATE, res, width, height);
 
     auto rendererParams = params.get<DataProxy>("renderer");
     if(rendererParams.second) {
@@ -317,6 +317,7 @@ namespace Gsage {
       mRenderers[name] = std::move(std::make_unique<SDLRenderer>(res, rendererParams.first, renderer, mCore));
     }
 
+    mWindowsByID[wrapper->getWindowID()] = res;
     mWindowsMutex.unlock();
     return res;
   }
@@ -326,8 +327,14 @@ namespace Gsage {
     mWindowsMutex.lock();
     bool res = windowDestroyed(window);
     // delete window renderer if any
-    if(res && contains(mRenderers, window->getName())) {
-      mRenderers.erase(window->getName());
+    if(res) {
+      if(contains(mRenderers, window->getName())) {
+        mRenderers.erase(window->getName());
+      }
+
+      Uint32 id = static_cast<SDLWindow*>(window.get())->getWindowID();
+      GSAGE_ASSERT(contains(mWindowsByID, id), "detected inconsistent windows state");
+      mWindowsByID.erase(id);
     }
     mWindowsMutex.unlock();
     return res;

@@ -57,6 +57,6 @@ namespace Gsage {
     unsigned int width, height, depth;
     int left, top;
     window->getMetrics(width, height, depth, left, top);
-    mEngine->fireEvent(WindowEvent(type, handle, width, height));
+    mEngine->fireEvent(WindowEvent(type, handle, window->getName().c_str(), width, height));
   }
 }

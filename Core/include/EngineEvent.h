@@ -173,14 +173,17 @@ namespace Gsage {
        */
       static const Event::Type MOVE;
 
-      WindowEvent(Event::ConstType type, size_t handle, unsigned int width = 0, unsigned int height = 0, int x = 0, int y = 0);
+      WindowEvent(Event::ConstType type, size_t handle, const char* name=NULL, unsigned int width = 0, unsigned int height = 0, int x = 0, int y = 0);
       virtual ~WindowEvent();
 
       unsigned int width;
       unsigned int height;
       int x;
       int y;
+      // window handle
       size_t handle;
+      // window name
+      const std::string name;
   };
 
   /**

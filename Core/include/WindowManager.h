@@ -190,11 +190,11 @@ namespace Gsage {
        * Fire window event
        *
        * @param type event type
-       * @param handle handle of the target window
+       * @param window current window
        * @param width current window window
        * @param height current window height
        */
-      virtual void fireWindowEvent(Event::ConstType type, unsigned long handle, unsigned int width = 0, unsigned int height = 0);
+      virtual void fireWindowEvent(Event::ConstType type, WindowPtr window, unsigned int width = 0, unsigned int height = 0);
 
       /**
        * Get window by name

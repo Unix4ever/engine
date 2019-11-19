@@ -121,13 +121,14 @@ namespace Gsage {
   {
   }
 
-  WindowEvent::WindowEvent(Event::ConstType type, size_t pHandle, unsigned int pWidth, unsigned int pHeight, int pX, int pY)
+  WindowEvent::WindowEvent(Event::ConstType type, size_t pHandle, const char* pName, unsigned int pWidth, unsigned int pHeight, int pX, int pY)
     : Event(type)
     , handle(pHandle)
     , width(pWidth)
     , height(pHeight)
     , x(pX)
     , y(pY)
+    , name(pName)
   {
   }
 

@@ -434,7 +434,6 @@ namespace Gsage {
       mWrappedTarget->update();
 #else
       if(mWorkspace && mCurrentCamera) {
-        mSceneManager->updateSceneGraph();
         mWorkspace->_update();
       }
 #endif
@@ -670,25 +669,25 @@ namespace Gsage {
 #endif
     if(parameters.get("useWindowManager", false)) {
       std::string handle = parameters.get<std::string>("windowHandle", "");
-      std::string glContext = parameters.get<std::string>("glContext", "");
+
 #if GSAGE_PLATFORM == GSAGE_APPLE
       params["macAPICocoaUseNSView"] = "true";
-#if OGRE_VERSION_MAJOR == 1
+#endif
+
+#if OGRE_VERSION_MAJOR == 1 || GSAGE_PLATFORM == GSAGE_WIN32
       params["externalWindowHandle"] = handle;
 #else
       params["parentWindowHandle"] = handle;
 #endif
-#else
-#if GSAGE_PLATFORM == GSAGE_WIN32
-      if(!glContext.empty()) {
-        params["externalGLContext"] = glContext;
-        params["externalGLControl"] = "True";
+      if(parameters.get("currentGLContext", false)) {
+        params["currentGLContext"] = "true";
       }
-      params["externalWindowHandle"] = handle;
-#endif
-      params["parentWindowHandle"] = handle;
-#endif
-      params["currentGLContext"] = parameters.get<std::string>("currentGLContext", "false");
+      if(parameters.get("externalGLControl", false)) {
+        params["externalGLControl"] = "true";
+      }
+      if(parameters.get("currentGLDrawable", false)) {
+        params["currentGLDrawable"] = "true";
+      }
     }
     mWidth = parameters.get("width", 1024);
     mHeight = parameters.get("height", 768);

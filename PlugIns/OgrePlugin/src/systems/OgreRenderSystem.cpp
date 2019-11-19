@@ -509,8 +509,16 @@ namespace Gsage {
 
     mEngine->fireEvent(RenderEvent(RenderEvent::UPDATE, this));
 
+#if OGRE_VERSION >= 0x020100
+    bool sceneGraphUpdated = false;
+#endif
     for(auto pair : mRenderTargets) {
       if(!pair.second->isAutoUpdated()) {
+#if OGRE_VERSION >= 0x020100
+        if(!sceneGraphUpdated) {
+          mSceneManager->updateSceneGraph();
+        }
+#endif
         pair.second->update();
       }
     }
@@ -519,7 +527,9 @@ namespace Gsage {
     if(continueRendering) {
 #if OGRE_VERSION >= 0x020100
       if(mRenderSystem->getFriendlyName() == "NULL_RS") {
-        mSceneManager->updateSceneGraph();
+        if(!sceneGraphUpdated) {
+          mSceneManager->updateSceneGraph();
+        }
         mSceneManager->clearFrameData();
       } else {
         continueRendering = mRoot->renderOneFrame();
@@ -1023,7 +1033,9 @@ namespace Gsage {
   bool OgreRenderSystem::handleWindowResized(EventDispatcher* sender, const Event& e)
   {
     const WindowEvent& event = static_cast<const WindowEvent&>(e);
-    mWindow->setDimensions(event.width, event.height);
+    if(mRenderTargets.find(event.name) != mRenderTargets.end()) {
+      mRenderTargets[event.name]->setDimensions(event.width, event.height);
+    }
     return true;
   }
 }

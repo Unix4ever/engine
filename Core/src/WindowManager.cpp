@@ -40,9 +40,9 @@ namespace Gsage {
     mWindows.clear();
   }
 
-  void WindowManager::fireWindowEvent(Event::ConstType type, unsigned long handle, unsigned int width, unsigned int height)
+  void WindowManager::fireWindowEvent(Event::ConstType type, WindowPtr window, unsigned int width, unsigned int height)
   {
-    fireEvent(WindowEvent(type, handle, width, height));
+    fireEvent(WindowEvent(type, window->getWindowHandle(), window->getName().c_str(), width, height));
   }
 
   WindowPtr WindowManager::getWindow(const std::string& name)
@@ -72,7 +72,7 @@ namespace Gsage {
   bool WindowManager::windowDestroyed(WindowPtr window)
   {
     if(contains(mWindows, window->getName())) {
-      fireWindowEvent(WindowEvent::CLOSE, window->getWindowHandle());
+      fireWindowEvent(WindowEvent::CLOSE, window);
       mWindows.erase(window->getName());
       return true;
     }
