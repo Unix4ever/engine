@@ -103,10 +103,7 @@ function handleKeyEvent(e)
     --selectTransform = true
     local ctx = imvue:getContext("Game")
     ctx:addDocument("test", "editor/simple.xml")
-    print(pcall(function()
-      --print(ctx)
-      --ctx:addDocument("editor", "editor/imvue/app.xml")
-    end))
+    ctx:addDocument("editor", "editor/imvue/app.xml")
   end
 end
 

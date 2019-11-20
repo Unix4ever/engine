@@ -64,11 +64,11 @@ return {
                 name = "__grid__",
                 commonUpVector = Vector3.new(0, 0, 1),
                 commonDirection = Vector3.new(0, 1, 0),
-                billboardType = "BBT_PERPENDICULAR_COMMON",
+                billboardType = "BBT_POINT",
                 materialName = "Utility.Grid",
                 billboards = {
                   {
-                    position = Vector3.new(0, -1, 0),
+                    position = Vector3.new(0, 0, -20),
                     width = 20,
                     height = 20
                   }

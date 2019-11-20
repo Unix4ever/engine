@@ -76,6 +76,7 @@ namespace Gsage {
     , mWindow(window)
     , mGLContext(nullptr)
     , mCursors(cursors)
+    , mTransparent(false)
   {
   }
 
@@ -202,6 +203,21 @@ namespace Gsage {
     }
   }
 
+  void SDLWindow::exposed()
+  {
+    if(mTransparent) {
+      SDL_SysWMinfo windowInfo;
+      SDL_VERSION(&windowInfo.version);
+      if(SDL_GetWindowWMInfo(mWindow, &windowInfo) == SDL_FALSE) {
+        LOG(ERROR) << "Failed to get window info " << mWindow;
+        return;
+      }
+#if GSAGE_PLATFORM == GSAGE_APPLE
+      MakeWindowTransparent(windowInfo);
+#endif
+    }
+  }
+
   SDLWindowManager::SDLWindowManager(const std::string& type, SDLCore* core)
     : WindowManager(type)
     , mCore(core)
@@ -302,6 +318,18 @@ namespace Gsage {
     SDLWindow* wrapper = new SDLWindow(name, window, mCursors);
     if(sdlContext) {
       wrapper->mGLContext = sdlContext;
+    }
+    wrapper->mTransparent = params.get("transparent", false);
+    if(wrapper->mTransparent) {
+      SDL_SysWMinfo windowInfo;
+      SDL_VERSION(&windowInfo.version);
+      if(SDL_GetWindowWMInfo(window, &windowInfo) == SDL_FALSE) {
+        LOG(ERROR) << "Failed to get window info " << window;
+        return 0;
+      }
+#if GSAGE_PLATFORM == GSAGE_APPLE
+      MakeWindowTransparent(windowInfo);
+#endif
     }
 
     SDL_Renderer* renderer = nullptr;

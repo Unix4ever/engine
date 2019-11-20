@@ -123,11 +123,14 @@ namespace Gsage {
       inline Uint32 getWindowID() const {
         return SDL_GetWindowID(mWindow);
       }
+
+      void exposed();
     private:
       friend class SDLWindowManager;
       SDL_Window* mWindow;
       SDL_GLContext mGLContext;
       Cursors& mCursors;
+      bool mTransparent;
   };
 
   /**

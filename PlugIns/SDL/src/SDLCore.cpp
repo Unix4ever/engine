@@ -29,6 +29,9 @@ THE SOFTWARE.
 #include "GsageFacade.h"
 #include "EngineEvent.h"
 #include "SDLWindowManager.h"
+#if GSAGE_PLATFORM == GSAGE_APPLE
+#include "OSXUtils.h"
+#endif
 
 namespace Gsage {
 
@@ -77,6 +80,9 @@ namespace Gsage {
               break;
             case SDL_WINDOWEVENT_MOVED:
               mFacade->getEngine()->fireEvent(WindowEvent(WindowEvent::MOVE, window->getWindowHandle(), window->getName().c_str(), 0, 0, event.window.data1, event.window.data2));
+              break;
+            case SDL_WINDOWEVENT_EXPOSED:
+              static_cast<SDLWindow*>(window.get())->exposed();
               break;
           }
           break;

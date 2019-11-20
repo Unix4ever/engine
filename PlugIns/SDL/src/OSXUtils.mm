@@ -38,6 +38,14 @@ namespace Gsage {
 
     return (unsigned long)view;
   }
+
+  extern void MakeWindowTransparent(SDL_SysWMinfo &info)
+  {
+    NSWindow *win = (NSWindow *)info.info.cocoa.window;
+    [win setOpaque:NO];
+    [win setHasShadow:NO];
+    [win setBackgroundColor:[NSColor yellowColor]];
+  }
 }
 
 

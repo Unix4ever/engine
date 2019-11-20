@@ -31,6 +31,8 @@ THE SOFTWARE.
 
 namespace Gsage {
   extern unsigned long WindowContentViewHandle(SDL_SysWMinfo &info);
+
+  extern void MakeWindowTransparent(SDL_SysWMinfo &info);
 }
 
 #endif

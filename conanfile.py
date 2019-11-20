@@ -44,7 +44,7 @@ class GsageConan(ConanFile):
     requires = (
         ("zlib/1.2.11@lasote/stable",),
         ("msgpack/2.1.3@gsage/master",),
-        ("SDL2/2.0.8@gsage/master",),
+        ("SDL2/2.0.10@gsage/master",),
         ("gtest/1.8.1@lasote/stable",),
         ("inja/2.0.1@gsage/master",),
         ("jsonformoderncpp/3.5.0@gsage/master",),
