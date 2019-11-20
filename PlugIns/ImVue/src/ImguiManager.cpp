@@ -406,6 +406,7 @@ namespace Gsage {
     doc->parse(data);
     ImGui::MemFree(data);
     mDocuments[name] = doc;
+    LOG(INFO) << "[" << mName << "]" << " Added document " << file;
     return true;
   }
 

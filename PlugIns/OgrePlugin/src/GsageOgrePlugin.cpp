@@ -182,7 +182,10 @@ namespace Gsage {
           sol::base_classes, sol::bases<EngineSystem, RenderSystem>(),
           "configure", &OgreRenderSystem::configure,
           "getObjectsInRadius", &OgreRenderSystem::getObjectsInRadius,
-          "createRenderTarget", &OgreRenderSystem::createRenderTarget,
+          "createRenderTarget", sol::overload(
+            (RenderTargetPtr(OgreRenderSystem::*)(const std::string&, RenderTargetType::Type, DataProxy)) &OgreRenderSystem::createRenderTarget,
+            (RenderTargetPtr(OgreRenderSystem::*)(const std::string&, RenderTargetType::Type, DataProxy, WindowPtr)) &OgreRenderSystem::createRenderTarget
+          ),
           "renderCameraToTarget", sol::overload(
             (void(OgreRenderSystem::*)(const std::string&, const std::string&)) &OgreRenderSystem::renderCameraToTarget,
             (void(OgreRenderSystem::*)(Ogre::Camera*, const std::string&)) &OgreRenderSystem::renderCameraToTarget

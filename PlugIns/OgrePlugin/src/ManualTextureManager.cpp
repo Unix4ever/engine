@@ -274,7 +274,7 @@ namespace Gsage {
     datablock->setTexture(Ogre::PBSM_DIFFUSE, 0, mTexture);*/
 #endif
     mTexture->addListener(this);
-    LOG(TRACE) << "Created texture " << mHandle << " with size " << width << "x" << height << " " << mParams;
+    LOG(TRACE) << "Created texture " << mHandle << " with size " << width << "x" << height;
     mValid = true;
     if(usage & Ogre::TU_RENDERTARGET) {
       mHasData = true;

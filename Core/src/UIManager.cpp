@@ -152,7 +152,7 @@ namespace Gsage {
   {
     const MouseEvent& e = static_cast<const MouseEvent&>(event);
     if(mContexts.count(e.dispatcher) == 0) {
-      return false;
+      return true;
     }
 
     mContexts[e.dispatcher]->processMouseEvent(dispatcher, e);

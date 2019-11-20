@@ -361,6 +361,16 @@ namespace Gsage
       RenderTargetPtr createRenderTarget(const std::string& name, RenderTargetType::Type type, DataProxy parameters);
 
       /**
+       * Create new render target
+       *
+       * @param name Render target name
+       * @param type Render target type
+       * @param parameters Additional parameters
+       * @param window Window pointer
+       */
+      RenderTargetPtr createRenderTarget(const std::string& name, RenderTargetType::Type type, DataProxy parameters, WindowPtr window);
+
+      /**
        * Get render target by name
        *
        * @param name Render target name

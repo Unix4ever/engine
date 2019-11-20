@@ -294,8 +294,7 @@ namespace Gsage {
     // initialize render window
     mRoot->initialise(false);
 
-    mWindow = createRenderTarget(windowName, RenderTargetType::Window, windowParams);
-    mWindow->setWindow(window);
+    mWindow = createRenderTarget(windowName, RenderTargetType::Window, windowParams, window);
 
     EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::RESIZE, &OgreRenderSystem::handleWindowResized, 0);
 
@@ -959,11 +958,25 @@ namespace Gsage {
     mRenderTargets[target]->setDimensions(width, height);
   }
 
+
   RenderTargetPtr OgreRenderSystem::createRenderTarget(const std::string& name, RenderTargetType::Type type, DataProxy parameters) {
+    return createRenderTarget(name, type, parameters, nullptr);
+  }
+
+  RenderTargetPtr OgreRenderSystem::createRenderTarget(const std::string& name, RenderTargetType::Type type, DataProxy parameters, WindowPtr window) {
     parameters.put("name", name);
+    if(window) {
+      std::stringstream ss;
+      ss << window->getWindowHandle();
+      parameters.put("windowHandle", ss.str());
+    }
+    std::string windowHandle = parameters.get("windowHandle", "");
+
     mRenderTargets[name] = mRenderTargetFactory.create(name, type, parameters, mEngine);
+    if(window) {
+      mRenderTargets[name]->setWindow(window);
+    }
     if(type == RenderTargetType::Window) {
-      std::string windowHandle = parameters.get("windowHandle", "");
       if(!windowHandle.empty()) {
         mRenderWindowsByHandle[windowHandle] = mRenderTargets[name];
       }
