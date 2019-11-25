@@ -120,6 +120,11 @@ namespace Gsage {
         return SDL_GetWindowFlags(mWindow) & SDL_WINDOW_MOUSE_FOCUS;
       }
 
+      void bringToFront()
+      {
+        return SDL_RaiseWindow(mWindow);
+      }
+
       inline Uint32 getWindowID() const {
         return SDL_GetWindowID(mWindow);
       }

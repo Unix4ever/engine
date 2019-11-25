@@ -136,6 +136,11 @@ namespace Gsage {
        * Check if window is focused
        */
       virtual bool focused() const = 0;
+
+      /**
+       * Bring window to front
+       */
+      virtual void bringToFront() = 0;
     protected:
       std::string mName;
       Cursor mCurrentCursor;
@@ -237,7 +242,7 @@ namespace Gsage {
       const std::string mType;
       std::map<std::string, WindowPtr> mWindows;
 
-      void windowCreated(WindowPtr window);
+      void windowCreated(WindowPtr window, bool injectRender = false);
       bool windowDestroyed(WindowPtr window);
 
       DialogResult openDialogSync(

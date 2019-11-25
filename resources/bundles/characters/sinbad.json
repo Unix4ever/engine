@@ -4,13 +4,6 @@
   "id": "sinbad",
   "render":
   {
-    "resources":
-    {
-      "Sinbad":
-      [
-        "Zip:models/packs/Sinbad.2.1.zip"
-      ]
-    },
     "root":
     {
       "name": "sinbad",

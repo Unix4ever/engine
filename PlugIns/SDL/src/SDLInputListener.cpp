@@ -53,8 +53,21 @@ namespace Gsage {
     mCore = core;
   }
 
+  void SDLInputListener::update(double time)
+  {
+    int x, y;
+    SDL_GetGlobalMouseState(&x, &y);
+    if(x != mMouseX || y != mMouseY) {
+      mMouseX = x;
+      mMouseY = y;
+      fireMouseEvent(MouseEvent::MOUSE_MOVE, x, y, 0);
+    }
+  }
+
   SDLInputListener::SDLInputListener(size_t handle, Engine* eventRedirect)
     : InputHandler(handle, eventRedirect)
+    , mMouseX(0)
+    , mMouseY(0)
   {
     mKeyMap[SDL_SCANCODE_ESCAPE] = KeyboardEvent::KC_ESCAPE;
     mKeyMap[SDL_SCANCODE_1] = KeyboardEvent::KC_1;
@@ -225,7 +238,7 @@ namespace Gsage {
   void SDLInputListener::handleMouseEvent(SDL_Event* event)
   {
     int x, y;
-    SDL_GetMouseState(&x, &y);
+    SDL_GetGlobalMouseState(&x, &y);
 
     switch(event->type) {
       case SDL_MOUSEWHEEL:

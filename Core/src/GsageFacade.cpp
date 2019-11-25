@@ -343,6 +343,7 @@ namespace Gsage {
       }
       addEventListener(mWindowManager.get(), WindowEvent::CREATE, &GsageFacade::handleWindowManagerEvent);
       addEventListener(mWindowManager.get(), WindowEvent::RESIZE, &GsageFacade::handleWindowManagerEvent);
+      addEventListener(mWindowManager.get(), WindowEvent::INJECT_RENDERER, &GsageFacade::handleWindowManagerEvent);
       addEventListener(mWindowManager.get(), WindowEvent::CLOSE, &GsageFacade::handleWindowManagerEvent);
       if(!mWindowManager->initialize(windowManager.first)) {
         LOG(ERROR) << "Failed to initialize window manager";

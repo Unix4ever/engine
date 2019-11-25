@@ -43,6 +43,33 @@ namespace Gsage {
   class GsageFacade;
   class ImguiManager;
 
+  /**
+   * Runs scope in the context
+   * Reverts context back at the end of the lifespan
+   */
+  struct ContextScope {
+    ContextScope(ImGuiContext* ctx)
+      : active(ctx)
+      , backup(nullptr)
+    {
+      if(!ctx) {
+        return;
+      }
+      backup = ImGui::GetCurrentContext();
+      ImGui::SetCurrentContext(ctx);
+    }
+
+    ~ContextScope()
+    {
+      if(!backup)
+        return;
+      ImGui::SetCurrentContext(backup);
+    }
+
+    ImGuiContext* active;
+    ImGuiContext* backup;
+  };
+
   class ImguiContext : public UIContext
   {
     public:
@@ -58,6 +85,14 @@ namespace Gsage {
        * Add new ImVue document to the imgui renderer
        */
       bool addDocument(const std::string& name, const std::string& file);
+
+      /**
+       * Gets wrapped imgui context
+       */
+      inline ImGuiContext* getWrappedContext()
+      {
+        return mContext;
+      }
 
     protected:
 

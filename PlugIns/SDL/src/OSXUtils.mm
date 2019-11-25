@@ -44,7 +44,13 @@ namespace Gsage {
     NSWindow *win = (NSWindow *)info.info.cocoa.window;
     [win setOpaque:NO];
     [win setHasShadow:NO];
-    [win setBackgroundColor:[NSColor yellowColor]];
+    [win setBackgroundColor:[NSColor clearColor]];
+  }
+
+  extern void AdjustWindowSettings(SDL_SysWMinfo &info)
+  {
+    NSWindow *win = (NSWindow *)info.info.cocoa.window;
+    [win setReleasedWhenClosed:YES];
   }
 }
 

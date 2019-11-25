@@ -71,6 +71,7 @@ namespace Gsage {
 
   InputManager::InputManager(Engine* engine)
     : mEngine(engine)
+    , mCurrentFactory(nullptr)
   {
     addEventListener(engine, WindowEvent::CREATE, &InputManager::handleWindowEvent);
     addEventListener(engine, WindowEvent::CLOSE, &InputManager::handleWindowEvent, 10);
@@ -96,12 +97,25 @@ namespace Gsage {
 
     if(mCurrentFactoryId == id) {
       mInputHandlers.clear();
+      mCurrentFactory = nullptr;
     }
   }
 
   void InputManager::useFactory(const std::string& id)
   {
     mCurrentFactoryId = id;
+    if(mCurrentFactoryId != id) {
+      mInputHandlers.clear();
+      mCurrentFactory = nullptr;
+    }
+
+    if(mCurrentFactory == nullptr && contains(mFactories, id)) {
+      mCurrentFactory = mFactories[id];
+      if(mCurrentFactory->getCapabilities() & AbstractInputFactory::Global) {
+        mInputHandlers[0] = InputHandlerPtr(mCurrentFactory->create(0, mEngine));
+        LOG(INFO) << "Created global input handler " << id;
+      }
+    }
   }
 
   void InputManager::update(double time)
@@ -113,13 +127,12 @@ namespace Gsage {
 
   bool InputManager::handleWindowEvent(EventDispatcher* sender, const Event& e)
   {
-    const WindowEvent& event = static_cast<const WindowEvent&>(e);
-    if(event.getType() == WindowEvent::CREATE && !mCurrentFactoryId.empty()) {
-      if(mFactories.count(mCurrentFactoryId) == 0) {
-        LOG(ERROR) << "Failed to init input of type '" << mCurrentFactoryId << "': no such factory";
-        return true;
-      }
+    if(!mCurrentFactory || (mCurrentFactory->getCapabilities() & AbstractInputFactory::PerWindow) == 0) {
+      return true;
+    }
 
+    const WindowEvent& event = static_cast<const WindowEvent&>(e);
+    if(event.getType() == WindowEvent::CREATE) {
       if(mInputHandlers.count(event.handle) != 0) {
         return true;
       }
@@ -127,7 +140,7 @@ namespace Gsage {
       LOG(INFO) << "Created input handler " << mCurrentFactoryId;
 
       // Create new handler
-      mInputHandlers[event.handle] = InputHandlerPtr(mFactories[mCurrentFactoryId]->create(event.handle, mEngine));
+      mInputHandlers[event.handle] = InputHandlerPtr(mCurrentFactory->create(event.handle, mEngine));
       mInputHandlers[event.handle]->handleResize(event.width, event.height);
     } else if(event.getType() == WindowEvent::CLOSE) {
       if(mInputHandlers.count(event.handle) == 0) {

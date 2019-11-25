@@ -21,7 +21,6 @@ class GsageConan(ConanFile):
     options = {
         "shared": [True, False],
         "with_ogre": ["1.9.0", "2.1.0", "disabled"],
-        "with_ois": [True, False],
         "with_librocket": [True, False],
         "with_lua_version": ["luajit-2.0.5", "luajit-2.1.0", "lua-5.1"],
         "with_recast": [True, False],
@@ -29,7 +28,6 @@ class GsageConan(ConanFile):
     }
     default_options = (
         "shared=False",
-        "with_ois=False",
         "with_ogre=disabled",
         "with_librocket=True",
         "with_lua_version=luajit-2.0.5",
@@ -89,8 +87,6 @@ class GsageConan(ConanFile):
                     self.options["OGRE"].with_metal = True
                     self.options.with_metal = True
 
-        if self.options.with_ois:
-            self.requires.add("OIS/1.3@gsage/master")
         if self.options.with_librocket:
             self.requires.add("libRocket/1.3.0@gsage/master")
             self.options["libRocket"].with_lua_bindings = True
@@ -123,9 +119,6 @@ class GsageConan(ConanFile):
 
         if self.settings.os == "Macos":
             options["CMAKE_OSX_ARCHITECTURES"] = "x86_64"
-
-        if self.options.with_ois:
-            options["WITH_OIS"] = self.options.with_ois
 
         if "luajit" in str(self.options.with_lua_version):
             options["WITH_LUAJIT"] = True

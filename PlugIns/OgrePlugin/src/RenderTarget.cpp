@@ -139,6 +139,10 @@ namespace Gsage {
     destroyCurrentWorkspace();
 #endif
     setCamera(nullptr);
+    if(mDefaultCamera) {
+      mSceneManager->destroyCamera(mDefaultCamera);
+    }
+    LOG(TRACE) << "Destroy render target " << mName;
   }
 
   void RenderTarget::subscribe()
@@ -174,16 +178,14 @@ namespace Gsage {
 
   bool RenderTarget::handleMouseEvent(EventDispatcher* sender, const Event& event)
   {
-    if(!mWindow || !mWindow->focused()) {
-      return true;
-    }
-
     const MouseEvent& e = static_cast<const MouseEvent&>(event);
-
-    if(e.dispatcher == mName || e.dispatcher != "main") {
+    if(!mWindow || e.dispatcher == mName || e.dispatcher != MouseEvent::MAIN_DISPATCHER) {
       return true;
     }
 
+    if(mWindow) {
+      std::tie(mX, mY) = mWindow->getPosition();
+    }
     mMouseOver = e.mouseX > mX &&
        e.mouseY > mY &&
        e.mouseX < mX + mWidth &&

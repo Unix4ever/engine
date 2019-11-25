@@ -40,31 +40,10 @@ THE SOFTWARE.
 #include "ImguiEvent.h"
 #include "ImguiImage.h"
 #include "ImguiViewport.h"
+#include "ImguiDetachableWindow.h"
 #include "FileLoader.h"
 
 namespace Gsage {
-
-  /**
-   * Runs scope in the context
-   * Reverts context back at the end of the lifespan
-   */
-  struct ContextScope {
-    ContextScope(ImGuiContext* ctx)
-      : active(ctx)
-    {
-      backup = ImGui::GetCurrentContext();
-      ImGui::SetCurrentContext(ctx);
-    }
-
-    ~ContextScope()
-    {
-      ImGui::SetCurrentContext(backup);
-    }
-
-    ImGuiContext* active;
-    ImGuiContext* backup;
-  };
-
 
   ImguiContext::ImguiContext(GsageFacade* facade)
     : mFacade(facade)
@@ -97,7 +76,7 @@ namespace Gsage {
         1e-4f); // see https://github.com/ocornut/imgui/commit/3c07ec6a6126fb6b98523a9685d1f0f78ca3c40c
 
     // Setup display size (every frame to accommodate for window resizing)
-    io.DisplaySize = ImVec2(mDisplaySizeX, mDisplaySizeX);
+    io.DisplaySize = ImVec2(mDisplaySizeX, mDisplaySizeY);
     io.MousePos = ImVec2(mMouseX, mMouseY);
     // Start the frame
     ImGui::NewFrame();
@@ -207,7 +186,7 @@ namespace Gsage {
         mFacade->getEngine()->settings().read("imgui.theme", theme);
       }
 
-      ImGuiStyle& style = ImGui::GetStyle();
+      ImGuiStyle& style = mContext->Style;
 
       DataProxy colors = theme.get("colors", DataProxy::create(DataWrapper::JSON_OBJECT));
 
@@ -381,6 +360,12 @@ namespace Gsage {
     factory->element<ImguiViewport>("viewport")
       .attribute("bg-colour", &ImguiViewport::bgColour)
       .attribute("texture", &ImguiViewport::textureID);
+
+    factory->element<ImguiDetachableWindow>("detachable-window")
+      .attribute("name", &ImguiDetachableWindow::name)
+      .attribute("open", &ImguiDetachableWindow::open)
+      .attribute("flags", &ImguiDetachableWindow::flags)
+      .setter("detached", &ImguiDetachableWindow::setDetached);
 
     ContextScope cs(mContext);
     ImVue::Context* ctx = ImVue::createContext(

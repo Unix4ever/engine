@@ -40,6 +40,7 @@ namespace Gsage
       static const Event::Type MOUSE_DOWN;
       static const Event::Type MOUSE_UP;
       static const Event::Type MOUSE_MOVE;
+      static constexpr const char* MAIN_DISPATCHER = "__main__";
 
       enum ButtonType { Left = 0, Right, Middle, Button3, Button4, Button5, Button6, Button7, None };
 
@@ -49,7 +50,7 @@ namespace Gsage
                  float width,
                  float height,
                  ButtonType button = None,
-                 const std::string& dispatcher = "main");
+                 const std::string& dispatcher = MAIN_DISPATCHER);
       virtual ~MouseEvent();
 
       ButtonType button;

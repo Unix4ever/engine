@@ -72,6 +72,8 @@ namespace Gsage {
 
   const Event::Type WindowEvent::MOVE = "WindowEvent::MOVE";
 
+  const Event::Type WindowEvent::INJECT_RENDERER = "WindowEvent::INJECT_RENDERER";
+
   EngineEvent::EngineEvent(Event::ConstType type) : Event(type)
   {
   }

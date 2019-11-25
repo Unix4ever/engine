@@ -1,8 +1,11 @@
+#ifndef _ImguiDetachableWindow_H_
+#define _ImguiDetachableWindow_H_
+
 /*
 -----------------------------------------------------------------------------
 This file is a part of Gsage engine
 
-Copyright (c) 2014-2016 Artem Chernyshev
+Copyright (c) 2014-2019 Gsage Contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,32 +27,34 @@ THE SOFTWARE.
 -----------------------------------------------------------------------------
 */
 
-#include "OisKeyboardEvent.h"
+#include "imvue_element.h"
+#include "WindowManager.h"
 
 namespace Gsage {
+  class GsageFacade;
+  class ImguiContext;
 
-  const Event::Type OisKeyboardEvent::KEY_DOWN = "keyDown";
-  const Event::Type OisKeyboardEvent::KEY_UP = "keyUp";
-
-  OisKeyboardEvent::OisKeyboardEvent(Event::ConstType type, const OIS::KeyCode& code, const unsigned int t, const unsigned int modState)
-    : Event(type)
-    , key(code)
-    , text(t)
-    , modifierState(modState)
+  class ImguiDetachableWindow : public ImVue::ContainerElement
   {
-  }
+    public:
+      ImguiDetachableWindow();
+      ~ImguiDetachableWindow();
 
-  OisKeyboardEvent::~OisKeyboardEvent()
-  {
-  }
+      void renderBody();
 
-  bool OisKeyboardEvent::isModifierDown(const OIS::Keyboard::Modifier& modifier)
-  {
-    return (modifierState & modifier) == modifier;
-  }
+      void setDetached(bool value);
 
-  unsigned int OisKeyboardEvent::getModifiersState() const
-  {
-    return modifierState;
-  }
+      char* name;
+      int flags;
+      bool open;
+    private:
+      static constexpr int DetachedFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse;
+      bool mDetached;
+      GsageFacade* mFacade;
+      WindowPtr mWindow;
+      ImVec2 mSize;
+      ImguiContext* mForeignContext;
+  };
 }
+
+#endif

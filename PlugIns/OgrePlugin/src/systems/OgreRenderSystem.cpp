@@ -296,7 +296,9 @@ namespace Gsage {
 
     mWindow = createRenderTarget(windowName, RenderTargetType::Window, windowParams, window);
 
-    EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::RESIZE, &OgreRenderSystem::handleWindowResized, 0);
+    EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::RESIZE, &OgreRenderSystem::handleWindowEvent, 0);
+    EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::CLOSE, &OgreRenderSystem::handleWindowEvent, 0);
+    EventSubscriber<OgreRenderSystem>::addEventListener(mEngine, WindowEvent::INJECT_RENDERER, &OgreRenderSystem::handleWindowEvent, 0);
 
     if(!settings.get("window.useWindowManager", false)) {
       mWindowEventListener = new WindowEventListener(getRenderWindow(), mEngine);
@@ -511,14 +513,21 @@ namespace Gsage {
 #if OGRE_VERSION >= 0x020100
     bool sceneGraphUpdated = false;
 #endif
-    for(auto pair : mRenderTargets) {
-      if(!pair.second->isAutoUpdated()) {
+
+    for (auto it = mRenderTargets.begin(); it != mRenderTargets.end();) {
+      if(it->second == 0) {
+        mRenderTargets.erase(it++);
+      } else {
+        if(!it->second->isAutoUpdated()) {
 #if OGRE_VERSION >= 0x020100
-        if(!sceneGraphUpdated) {
-          mSceneManager->updateSceneGraph();
-        }
+          if(!sceneGraphUpdated) {
+            mSceneManager->updateSceneGraph();
+            sceneGraphUpdated = true;
+          }
 #endif
-        pair.second->update();
+          it->second->update();
+        }
+        ++it;
       }
     }
 
@@ -528,6 +537,7 @@ namespace Gsage {
       if(mRenderSystem->getFriendlyName() == "NULL_RS") {
         if(!sceneGraphUpdated) {
           mSceneManager->updateSceneGraph();
+          sceneGraphUpdated = true;
         }
         mSceneManager->clearFrameData();
       } else {
@@ -975,11 +985,7 @@ namespace Gsage {
     mRenderTargets[name] = mRenderTargetFactory.create(name, type, parameters, mEngine);
     if(window) {
       mRenderTargets[name]->setWindow(window);
-    }
-    if(type == RenderTargetType::Window) {
-      if(!windowHandle.empty()) {
-        mRenderWindowsByHandle[windowHandle] = mRenderTargets[name];
-      }
+      LOG(INFO) << name << " " << window;
     }
 
     if(mSceneManager) {
@@ -1043,11 +1049,39 @@ namespace Gsage {
     return mWindow;
   }
 
-  bool OgreRenderSystem::handleWindowResized(EventDispatcher* sender, const Event& e)
+  bool OgreRenderSystem::handleWindowEvent(EventDispatcher* sender, const Event& e)
   {
     const WindowEvent& event = static_cast<const WindowEvent&>(e);
-    if(mRenderTargets.find(event.name) != mRenderTargets.end()) {
-      mRenderTargets[event.name]->setDimensions(event.width, event.height);
+    if(e.getType() == WindowEvent::RESIZE) {
+      if(mRenderTargets.find(event.name) != mRenderTargets.end()) {
+        mRenderTargets[event.name]->setDimensions(event.width, event.height);
+      }
+    } else if(e.getType() == WindowEvent::INJECT_RENDERER) {
+      if(mRenderTargets.find(event.name) == mRenderTargets.end()) {
+        WindowPtr window = mFacade->getWindowManager()->getWindow(event.name);
+        GSAGE_ASSERT(window != 0, "renderer inject failure: window is null");
+
+        DataProxy params;
+        params.put("currentGLContext", true);
+        DataProxy camera;
+        // generate unique camera ID
+        std::stringstream ss;
+        ss << event.name << event.handle;
+        camera.put("name", ss.str());
+        params.put("defaultCamera", camera);
+        int width, height;
+        std::tie(width, height) = window->getSize();
+        params.put("width", width);
+        params.put("height", height);
+        params.put("useWindowManager", true);
+        createRenderTarget(event.name, RenderTargetType::Window, params, window);
+      }
+    } else if(e.getType() == WindowEvent::CLOSE) {
+      if(mRenderTargets.find(event.name) != mRenderTargets.end()) {
+        mRenderTargetsReverseIndex.erase(mRenderTargets[event.name]->getOgreRenderTarget());
+        delete mRenderTargets[event.name];
+        mRenderTargets[event.name] = 0;
+      }
     }
     return true;
   }

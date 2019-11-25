@@ -73,7 +73,7 @@ namespace Gsage {
        * @param event SDL event
        */
       void handleEvent(SDL_Event* event);
-      virtual void update(double time) {};
+      virtual void update(double time);
       virtual void handleResize(unsigned int width, unsigned int height) {};
       virtual void handleClose() {};
     private:
@@ -91,6 +91,8 @@ namespace Gsage {
       void handleKeyboardEvent(SDL_Event* event);
     private:
       std::map<SDL_Keycode, KeyboardEvent::Key> mKeyMap;
+      int mMouseX;
+      int mMouseY;
   };
 }
 

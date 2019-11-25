@@ -426,12 +426,7 @@ namespace Gsage
        */
       UIRendererPtr createUIRenderer() const;
     protected:
-      /**
-       * Handle window resizing
-       * @param sender Engine
-       * @param event WindowEvent
-       */
-      bool handleWindowResized(EventDispatcher* sender, const Event& event);
+      bool handleWindowEvent(EventDispatcher* sender, const Event& event);
 
       bool installPlugin(const std::string& name);
 
@@ -465,9 +460,6 @@ namespace Gsage
       RenderTargetReverseIndex mRenderTargetsReverseIndex;
 
       RenderTargetFactory mRenderTargetFactory;
-
-      typedef std::map<std::string, RenderTargetPtr> RenderWindowsByHandle;
-      RenderWindowsByHandle mRenderWindowsByHandle;
 
       RenderTargetPtr mWindow;
 #if OGRE_VERSION >= 0x020100

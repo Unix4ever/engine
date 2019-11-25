@@ -236,6 +236,8 @@ namespace Gsage {
 
   bool SDLWindowManager::initialize(const DataProxy& config)
   {
+    SDL_SetHintWithPriority(SDL_HINT_MOUSE_FOCUS_CLICKTHROUGH, "1", SDL_HINT_OVERRIDE);
+    SDL_SetHint(SDL_HINT_MAC_CTRL_CLICK_EMULATE_RIGHT_CLICK, "1");
     int initializationCode = SDL_InitSubSystem(SDL_INIT_VIDEO);
     if(initializationCode < 0) {
       LOG(ERROR) << "Failed to initialize video subsystem " << SDL_GetError();
@@ -320,13 +322,16 @@ namespace Gsage {
       wrapper->mGLContext = sdlContext;
     }
     wrapper->mTransparent = params.get("transparent", false);
+    SDL_SysWMinfo windowInfo;
+    SDL_VERSION(&windowInfo.version);
+    if(SDL_GetWindowWMInfo(window, &windowInfo) == SDL_FALSE) {
+      LOG(ERROR) << "Failed to get window info " << window;
+      return 0;
+    }
+#if GSAGE_PLATFORM == GSAGE_APPLE
+    AdjustWindowSettings(windowInfo);
+#endif
     if(wrapper->mTransparent) {
-      SDL_SysWMinfo windowInfo;
-      SDL_VERSION(&windowInfo.version);
-      if(SDL_GetWindowWMInfo(window, &windowInfo) == SDL_FALSE) {
-        LOG(ERROR) << "Failed to get window info " << window;
-        return 0;
-      }
 #if GSAGE_PLATFORM == GSAGE_APPLE
       MakeWindowTransparent(windowInfo);
 #endif
@@ -335,9 +340,8 @@ namespace Gsage {
     SDL_Renderer* renderer = nullptr;
 
     mWindowsMutex.lock();
-    WindowPtr res = WindowPtr(wrapper);
-    windowCreated(res);
-    fireWindowEvent(WindowEvent::CREATE, res, width, height);
+    WindowPtr res(wrapper);
+    windowCreated(res, params.get("render", false));
 
     auto rendererParams = params.get<DataProxy>("renderer");
     if(rendererParams.second) {

@@ -181,6 +181,15 @@ namespace Gsage
        */
       virtual void setLuaState(lua_State* L);
 
+      inline UIContext* getContext(const char* name)
+      {
+        if(mContexts.find(name) != mContexts.end()) {
+          return mContexts[name].get();
+        }
+
+        return nullptr;
+      }
+
       // abstract
 
       /**
@@ -202,6 +211,7 @@ namespace Gsage
         // TODO: make it abstract later on
         return nullptr;
       }
+
 
     protected:
 

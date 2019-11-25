@@ -172,6 +172,10 @@ namespace Gsage {
        * Window moved
        */
       static const Event::Type MOVE;
+      /**
+       * Demand renderer injection for the window
+       */
+      static const Event::Type INJECT_RENDERER;
 
       WindowEvent(Event::ConstType type, size_t handle, const char* name=NULL, unsigned int width = 0, unsigned int height = 0, int x = 0, int y = 0);
       virtual ~WindowEvent();

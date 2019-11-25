@@ -64,9 +64,16 @@ namespace Gsage {
     return nullptr;
   }
 
-  void WindowManager::windowCreated(WindowPtr window)
+  void WindowManager::windowCreated(WindowPtr window, bool injectRender)
   {
     mWindows[window->getName()] = window;
+    int width, height;
+    std::tie(width, height) = window->getSize();
+    fireWindowEvent(WindowEvent::CREATE, window, width, height);
+
+    if(injectRender) {
+      fireWindowEvent(WindowEvent::INJECT_RENDERER, window, width, height);
+    }
   }
 
   bool WindowManager::windowDestroyed(WindowPtr window)

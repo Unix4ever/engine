@@ -254,7 +254,8 @@ namespace Gsage {
 
             return w->openDialog(mode, title, defaultFilePath, actualFilters);
         },
-        "createWindow", &WindowManager::createWindow
+        "createWindow", &WindowManager::createWindow,
+        "destroyWindow", &WindowManager::destroyWindow
     );
 
     lua.new_usertype<Filesystem>("Filesystem",

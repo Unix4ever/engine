@@ -6,10 +6,6 @@ if(${LIBROCKET_FOUND})
   #  add_subdirectory(RocketUI)
 endif(${LIBROCKET_FOUND})
 
-if(OIS_FOUND AND "${WITH_OIS}" STREQUAL "True")
-  add_subdirectory(OisInput)
-endif(OIS_FOUND AND "${WITH_OIS}" STREQUAL "True")
-
 if(${SDL_FOUND})
   add_subdirectory(SDL)
 endif(${SDL_FOUND})

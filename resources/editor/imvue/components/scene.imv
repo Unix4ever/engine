@@ -11,7 +11,7 @@ return {
   props = {
     ['bg-colour'] = {
       type = ImVue_Number,
-      default = 0xFF000000
+      default = 0x00000000
     },
     ['texture-id'] = {
       type = ImVue_String,
@@ -64,7 +64,7 @@ return {
                 name = "__grid__",
                 commonUpVector = Vector3.new(0, 0, 1),
                 commonDirection = Vector3.new(0, 1, 0),
-                billboardType = "BBT_POINT",
+                billboardType = "BBT_ORIENTED_COMMON",
                 materialName = "Utility.Grid",
                 billboards = {
                   {

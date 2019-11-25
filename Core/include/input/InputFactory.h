@@ -80,6 +80,13 @@ namespace Gsage {
   class AbstractInputFactory
   {
     public:
+      enum Capabilities {
+        // use one single global input handler
+        Global    = 1 << 0,
+        // use handler per window
+        PerWindow = 1 << 1
+      };
+
       AbstractInputFactory() {};
       virtual ~AbstractInputFactory() {};
       /**
@@ -91,12 +98,18 @@ namespace Gsage {
        * @returns pointer to handler. It should be wrapped into smart pointer
        */
       virtual InputHandlerPtr create(size_t windowHandle, Engine* engine) = 0;
+
+      /**
+       * Input factory capabilities
+       */
+      virtual Capabilities getCapabilities() const {
+        return Global;
+      }
   };
 
   /**
    * Input manager creates input handler for each new window.
    * Type of input can be configured by passing any concrete factory to the constructor.
-   * For example: OisInputFactory
    */
   class InputManager : public EventSubscriber<InputManager>, public UpdateListener
   {
@@ -129,6 +142,9 @@ namespace Gsage {
         }
         T* factory = new T();
         mFactories[id] = factory;
+        if(mCurrentFactoryId == id) {
+          useFactory(id);
+        }
         return factory;
       }
 
@@ -150,6 +166,7 @@ namespace Gsage {
        * Get current factory ID
        */
       inline const std::string& getCurrentFactoryId() const { return mCurrentFactoryId; }
+
     private:
       bool handleWindowEvent(EventDispatcher* sender, const Event& e);
       Engine* mEngine;
@@ -161,6 +178,7 @@ namespace Gsage {
       InputFactories mFactories;
 
       std::string mCurrentFactoryId;
+      AbstractInputFactory* mCurrentFactory;
   };
 }
 
